@@ -143,8 +143,14 @@ client-side routing, skal hosten sende alle ruter til `index.html`, ellers
 giver et direkte hit på `/admin` en 404. `vercel.json` og `public/_redirects`
 er med for henholdsvis Vercel og Netlify.
 
-Husk at sætte `VITE_SUPABASE_URL` og `VITE_SUPABASE_ANON_KEY` som miljø-
-variabler hos hosten — de bages ind i buildet.
+Ligger på Vercel som projektet `idebanken` (personlig konto, intet team).
+
+**Miljøvariabler:** `VITE_SUPABASE_URL` og `VITE_SUPABASE_ANON_KEY` bages ind
+i buildet og skal derfor være sat *når der bygges*. Den første deploy blev
+lavet med en `.env.production` i selve upload'en. Kobler du projektet til git
+i stedet, så sæt de to under Vercel → Project → Settings → Environment
+Variables — ellers kaster `src/lib/supabase.ts` ved indlæsning, og siden
+bliver hvid.
 
 ## Designet
 
