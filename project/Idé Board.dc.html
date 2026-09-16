@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; background: #0B0F12; }
+  input, textarea, select, button { font: inherit; color: inherit; }
+  input:focus, textarea:focus, select:focus { outline: 2px solid #C7F464; outline-offset: 1px; }
+  a { color: #C7F464; text-decoration: none; }
+  a:hover { color: #E4FFA6; text-decoration: underline; }
+  ::-webkit-scrollbar { height: 10px; width: 10px; }
+  ::-webkit-scrollbar-thumb { background: #26313A; border-radius: 6px; }
+  ::placeholder { color: #5E6E77; }
+  @keyframes slidein { from { transform: translateX(28px); opacity: 0 } to { transform: none; opacity: 1 } }
+  @keyframes fadein { from { opacity: 0 } to { opacity: 1 } }
+</style>
+</helmet>
+<div style="min-height:100vh;background:#0B0F12;color:#ECF2F0;font-family:Archivo,system-ui,sans-serif;font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased">
+
+  <header style="border-bottom:1px solid #1E272E;background:#0B0F12;position:sticky;top:0;z-index:20">
+    <div style="max-width:1680px;margin:0 auto;padding:16px 26px;display:flex;align-items:center;gap:22px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0">
+        <div style="width:34px;height:34px;border-radius:9px;background:#C7F464;color:#0B0F12;display:grid;place-items:center;font-weight:800;font-size:17px;letter-spacing:-0.04em;flex:none">ID</div>
+        <div style="min-width:0">
+          <div style="font-weight:800;font-size:17px;letter-spacing:-0.02em;line-height:1.15">Idéboard</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#8A9AA2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ gameName }}</div>
+        </div>
+      </div>
+      <div style="flex:1 1 200px"></div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px;background:#141A1F;border:1px solid #26313A;border-radius:9px;padding:0 12px;height:38px">
+          <span style="color:#5E6E77;font-size:13px">Søg</span>
+          <input value="{{ query }}" onInput="{{ onQuery }}" placeholder="titel eller tekst…" style="background:none;border:0;width:150px;font-size:13.5px;height:36px" />
+        </div>
+        <button onClick="{{ goBoard }}" style="height:38px;padding:0 15px;border-radius:9px;border:1px solid #26313A;background:#141A1F;color:#8A9AA2;font-weight:600;font-size:13.5px;cursor:pointer" style-hover="color:#ECF2F0;border-color:#3A4852">Board</button>
+        <button onClick="{{ goAdmin }}" style="height:38px;padding:0 15px;border-radius:9px;border:1px solid #26313A;background:#141A1F;color:#8A9AA2;font-weight:600;font-size:13.5px;cursor:pointer;display:flex;align-items:center;gap:8px" style-hover="color:#ECF2F0;border-color:#3A4852">Admin<span style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:#F0B429;color:#0B0F12;border-radius:20px;padding:1px 7px;font-weight:600">{{ pendingCount }}</span></button>
+        <button onClick="{{ openForm }}" style="height:38px;padding:0 17px;border-radius:9px;border:0;background:#C7F464;color:#0B0F12;font-weight:700;font-size:13.5px;cursor:pointer" style-hover="background:#D9FF7C">Indsend idé</button>
+      </div>
+    </div>
+    <div style="max-width:1680px;margin:0 auto;padding:0 26px">
+      <div style="height:3px;background:{{ viewBarColor }};border-radius:3px 3px 0 0;width:62px"></div>
+    </div>
+  </header>
+
+  <sc-if value="{{ isBoard }}" hint-placeholder-val="{{ true }}">
+  <main style="max-width:1680px;margin:0 auto;padding:26px">
+
+    <div style="display:flex;gap:26px;align-items:flex-end;flex-wrap:wrap;margin-bottom:24px">
+      <div style="max-width:560px">
+        <h1 style="margin:0 0 8px;font-size:30px;font-weight:800;letter-spacing:-0.03em;line-height:1.1;text-wrap:pretty">Hvad skal vi bygge i næste sæson?</h1>
+        <p style="margin:0;color:#8A9AA2;font-size:14.5px;text-wrap:pretty">Send dit forslag ind — helt anonymt. Alle forslag læses igennem, får en status og bliver liggende her, så du kan følge dem hele vejen fra idé til udgivelse.</p>
+      </div>
+      <div style="flex:1 1 300px;display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px">
+        <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+          <div style="background:#141A1F;border:1px solid #1E272E;border-radius:11px;padding:12px 14px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;letter-spacing:-0.03em;color:{{ s.color }}">{{ s.value }}</div>
+            <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#8A9AA2;margin-top:2px">{{ s.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-bottom:18px;border-bottom:1px solid #1E272E;margin-bottom:20px">
+      <sc-for list="{{ cats }}" as="c" hint-placeholder-count="9">
+        <button onClick="{{ c.onClick }}" style="height:32px;padding:0 13px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:600;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.fg }}" style-hover="border-color:#3A4852">{{ c.label }}</button>
+      </sc-for>
+      <div style="flex:1 1 20px"></div>
+      <div style="display:flex;gap:2px;background:#141A1F;border:1px solid #26313A;border-radius:9px;padding:3px">
+        <sc-for list="{{ types }}" as="t" hint-placeholder-count="4">
+          <button onClick="{{ t.onClick }}" style="height:28px;padding:0 12px;border-radius:7px;border:0;cursor:pointer;font-size:12.5px;font-weight:600;background:{{ t.bg }};color:{{ t.fg }}">{{ t.label }}</button>
+        </sc-for>
+      </div>
+      <select value="{{ sort }}" onChange="{{ onSort }}" style="height:34px;padding:0 10px;border-radius:9px;border:1px solid #26313A;background:#141A1F;font-size:13px;cursor:pointer">
+        <sc-for list="{{ sortOptions }}" as="o" hint-placeholder-count="3">
+          <option value="{{ o.value }}">{{ o.label }}</option>
+        </sc-for>
+      </select>
+    </div>
+
+    <div style="display:flex;gap:14px;overflow-x:auto;padding-bottom:14px;align-items:flex-start">
+      <sc-for list="{{ columns }}" as="col" hint-placeholder-count="6">
+        <div style="flex:0 0 286px;display:grid;gap:11px">
+          <div style="display:flex;align-items:center;gap:9px;padding:0 2px">
+            <span style="width:9px;height:9px;border-radius:50%;flex:none;background:{{ col.color }}"></span>
+            <span style="font-size:12px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase">{{ col.label }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8A9AA2;margin-left:auto">{{ col.count }}</span>
+          </div>
+          <div style="height:2px;border-radius:2px;background:{{ col.color }};opacity:0.55"></div>
+          <sc-for list="{{ col.items }}" as="idea" hint-placeholder-count="3">
+            <div onClick="{{ idea.onOpen }}" draggable="{{ idea.draggable }}" onDragStart="{{ idea.onDragStart }}" style="background:#141A1F;border:1px solid #26313A;border-radius:11px;padding:13px 14px;display:grid;gap:9px;cursor:pointer" style-hover="border-color:#3A4852;background:#171E24">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;padding:2px 7px;border-radius:5px;background:{{ idea.typeBg }};color:{{ idea.typeColor }}">{{ idea.typeLabel }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5E6E77;margin-left:auto">{{ idea.ref }}</span>
+              </div>
+              <div style="font-size:14.5px;font-weight:700;letter-spacing:-0.01em;line-height:1.3;text-wrap:pretty">{{ idea.title }}</div>
+              <div style="font-size:12px;color:#8A9AA2">{{ idea.metaLine }}</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:2px">
+                <div style="display:flex;align-items:center;border:1px solid #26313A;border-radius:8px;overflow:hidden">
+                  <button onClick="{{ idea.onUp }}" title="Godt forslag" style="border:0;background:{{ idea.upBg }};color:{{ idea.upFg }};height:28px;padding:0 9px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px" style-hover="filter:brightness(1.35)">▲ {{ idea.up }}</button>
+                  <sc-if value="{{ allowDislike }}" hint-placeholder-val="{{ true }}">
+                    <button onClick="{{ idea.onDown }}" title="Ikke for mig" style="border:0;border-left:1px solid #26313A;background:{{ idea.downBg }};color:{{ idea.downFg }};height:28px;padding:0 9px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600" style-hover="filter:brightness(1.35)">▼ {{ idea.down }}</button>
+                  </sc-if>
+                </div>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#8A9AA2;margin-left:auto">{{ idea.commentCount }} svar</span>
+              </div>
+              <sc-if value="{{ idea.hasOfficial }}" hint-placeholder-val="{{ false }}">
+                <div style="border-top:1px dashed #26313A;padding-top:8px;font-size:11.5px;color:#C7F464;font-weight:600">Svar fra holdet</div>
+              </sc-if>
+            </div>
+          </sc-for>
+          <sc-if value="{{ col.empty }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1px dashed #26313A;border-radius:11px;padding:18px 14px;text-align:center;color:#5E6E77;font-size:12.5px">Ingen forslag her</div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="margin-top:22px;border-top:1px solid #1E272E;padding-top:18px">
+      <button onClick="{{ toggleArchive }}" style="background:none;border:0;cursor:pointer;color:#8A9AA2;font-weight:700;font-size:12px;letter-spacing:0.09em;text-transform:uppercase;display:flex;align-items:center;gap:9px;padding:0" style-hover="color:#ECF2F0">{{ archiveLabel }}<span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5E6E77;letter-spacing:0">Afvist · På pause</span></button>
+      <sc-if value="{{ archiveOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:14px;overflow-x:auto;padding:16px 0 4px;align-items:flex-start">
+          <sc-for list="{{ archiveColumns }}" as="col" hint-placeholder-count="2">
+            <div style="flex:0 0 286px;display:grid;gap:11px">
+              <div style="display:flex;align-items:center;gap:9px;padding:0 2px">
+                <span style="width:9px;height:9px;border-radius:50%;flex:none;background:{{ col.color }}"></span>
+                <span style="font-size:12px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#8A9AA2">{{ col.label }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5E6E77;margin-left:auto">{{ col.count }}</span>
+              </div>
+              <sc-for list="{{ col.items }}" as="idea" hint-placeholder-count="2">
+                <div onClick="{{ idea.onOpen }}" style="background:#10161A;border:1px solid #1E272E;border-radius:11px;padding:12px 14px;display:grid;gap:7px;cursor:pointer" style-hover="border-color:#3A4852">
+                  <div style="font-size:13.5px;font-weight:600;color:#B4C2C7;line-height:1.3">{{ idea.title }}</div>
+                  <div style="font-size:11.5px;color:#5E6E77;font-family:'IBM Plex Mono',monospace">{{ idea.ref }} · ▲ {{ idea.up }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+  <main style="max-width:1680px;margin:0 auto;padding:24px 26px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#F0B429;border:1px solid #4A3A12;background:#241C08;border-radius:6px;padding:4px 9px">Kun for dig</div>
+      <div style="display:flex;gap:3px;background:#141A1F;border:1px solid #26313A;border-radius:10px;padding:3px">
+        <sc-for list="{{ adminTabs }}" as="t" hint-placeholder-count="4">
+          <button onClick="{{ t.onClick }}" style="height:30px;padding:0 14px;border-radius:7px;border:0;cursor:pointer;font-size:13px;font-weight:600;background:{{ t.bg }};color:{{ t.fg }};display:flex;align-items:center;gap:7px">{{ t.label }}<span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;opacity:0.7">{{ t.badge }}</span></button>
+        </sc-for>
+      </div>
+    </div>
+
+    <sc-if value="{{ tabIsBoard }}" hint-placeholder-val="{{ true }}">
+      <div style="font-size:12.5px;color:#8A9AA2;margin-bottom:14px">Træk et kort til en anden kolonne for at ændre status. Ændringen er synlig for alle med det samme.</div>
+      <div style="display:flex;gap:14px;overflow-x:auto;padding-bottom:16px;align-items:flex-start">
+        <sc-for list="{{ adminColumns }}" as="col" hint-placeholder-count="8">
+          <div onDragOver="{{ col.onDragOver }}" onDrop="{{ col.onDrop }}" style="flex:0 0 272px;display:grid;gap:10px;background:{{ col.dropBg }};border:1px dashed {{ col.dropBorder }};border-radius:13px;padding:11px;min-height:150px">
+            <div style="display:flex;align-items:center;gap:9px">
+              <span style="width:9px;height:9px;border-radius:50%;flex:none;background:{{ col.color }}"></span>
+              <span style="font-size:11.5px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">{{ col.label }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8A9AA2;margin-left:auto">{{ col.count }}</span>
+            </div>
+            <sc-for list="{{ col.items }}" as="idea" hint-placeholder-count="2">
+              <div draggable="{{ idea.draggable }}" onDragStart="{{ idea.onDragStart }}" onClick="{{ idea.onOpen }}" style="background:#141A1F;border:1px solid #26313A;border-radius:10px;padding:11px 12px;display:grid;gap:7px;cursor:grab" style-hover="border-color:#3A4852">
+                <div style="font-size:13.5px;font-weight:700;line-height:1.3">{{ idea.title }}</div>
+                <div style="display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A9AA2">
+                  <span>{{ idea.ref }}</span><span style="color:{{ idea.typeColor }}">{{ idea.typeLabel }}</span><span style="margin-left:auto">▲{{ idea.up }} ▼{{ idea.down }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ tabIsQueue }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;gap:12px;max-width:900px">
+        <sc-for list="{{ pending }}" as="p" hint-placeholder-count="3">
+          <div style="background:#141A1F;border:1px solid #26313A;border-radius:13px;padding:16px 18px;display:grid;gap:12px">
+            <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+              <div style="font-size:16px;font-weight:700;letter-spacing:-0.01em">{{ p.title }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5E6E77;margin-left:auto">{{ p.ref }} · {{ p.when }}</div>
+            </div>
+            <div style="font-size:13.5px;color:#B4C2C7;text-wrap:pretty">{{ p.body }}</div>
+            <div style="display:flex;gap:7px;flex-wrap:wrap;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:#8A9AA2">
+              <span style="border:1px solid #26313A;border-radius:5px;padding:3px 8px">{{ p.cat }}</span>
+              <span style="border:1px solid #26313A;border-radius:5px;padding:3px 8px">{{ p.typeLabel }}</span>
+              <span style="border:1px solid #26313A;border-radius:5px;padding:3px 8px">{{ p.importance }}</span>
+              <span style="border:1px solid #26313A;border-radius:5px;padding:3px 8px">{{ p.platform }}</span>
+              <span style="border:1px solid #26313A;border-radius:5px;padding:3px 8px">{{ p.author }}</span>
+            </div>
+            <sc-if value="{{ p.hasSimilar }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#10161A;border:1px solid #1E272E;border-radius:9px;padding:10px 12px;font-size:12.5px;color:#8A9AA2">Ligner: <span style="color:#ECF2F0;font-weight:600">{{ p.similarTitle }}</span></div>
+            </sc-if>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <button onClick="{{ p.onApprove }}" style="height:34px;padding:0 15px;border-radius:8px;border:0;background:#C7F464;color:#0B0F12;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:#D9FF7C">Godkend til board</button>
+              <button onClick="{{ p.onReject }}" style="height:34px;padding:0 15px;border-radius:8px;border:1px solid #4A2222;background:#1C1111;color:#F87171;font-weight:600;font-size:13px;cursor:pointer" style-hover="border-color:#7A3333">Afvis</button>
+              <button onClick="{{ p.onMerge }}" style="height:34px;padding:0 15px;border-radius:8px;border:1px solid #26313A;background:#10161A;color:#8A9AA2;font-weight:600;font-size:13px;cursor:pointer" style-hover="color:#ECF2F0;border-color:#3A4852">Flet som dublet</button>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ noPending }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px dashed #26313A;border-radius:13px;padding:34px;text-align:center;color:#5E6E77;font-size:13.5px">Køen er tom. Alt er behandlet.</div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ tabIsComments }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;gap:10px;max-width:900px">
+        <sc-for list="{{ allComments }}" as="c" hint-placeholder-count="5">
+          <div style="background:#141A1F;border:1px solid #26313A;border-radius:11px;padding:13px 15px;display:flex;gap:14px;align-items:flex-start">
+            <div style="display:grid;gap:5px;min-width:0">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5E6E77">{{ c.on }} · {{ c.author }} · {{ c.when }}</div>
+              <div style="font-size:13.5px;color:{{ c.textColor }};text-wrap:pretty">{{ c.text }}</div>
+            </div>
+            <button onClick="{{ c.onToggle }}" style="margin-left:auto;flex:none;height:30px;padding:0 12px;border-radius:8px;border:1px solid #26313A;background:#10161A;color:#8A9AA2;font-weight:600;font-size:12.5px;cursor:pointer" style-hover="color:#ECF2F0;border-color:#3A4852">{{ c.action }}</button>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ tabIsStats }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;max-width:1100px">
+        <div style="background:#141A1F;border:1px solid #26313A;border-radius:13px;padding:18px">
+          <div style="font-size:11.5px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#8A9AA2;margin-bottom:16px">Forslag pr. område</div>
+          <div style="display:grid;gap:11px">
+            <sc-for list="{{ catBars }}" as="b" hint-placeholder-count="8">
+              <div style="display:grid;gap:5px">
+                <div style="display:flex;font-size:12.5px"><span>{{ b.label }}</span><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;color:#8A9AA2">{{ b.value }}</span></div>
+                <div style="height:6px;border-radius:4px;background:#1E272E"><div style="height:6px;border-radius:4px;background:#C7F464;width:{{ b.width }}"></div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="background:#141A1F;border:1px solid #26313A;border-radius:13px;padding:18px">
+          <div style="font-size:11.5px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#8A9AA2;margin-bottom:16px">Status-fordeling</div>
+          <div style="display:grid;gap:11px">
+            <sc-for list="{{ statusBars }}" as="b" hint-placeholder-count="8">
+              <div style="display:grid;gap:5px">
+                <div style="display:flex;font-size:12.5px"><span>{{ b.label }}</span><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;color:#8A9AA2">{{ b.value }}</span></div>
+                <div style="height:6px;border-radius:4px;background:#1E272E"><div style="height:6px;border-radius:4px;background:{{ b.color }};width:{{ b.width }}"></div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="background:#141A1F;border:1px solid #26313A;border-radius:13px;padding:18px">
+          <div style="font-size:11.5px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#8A9AA2;margin-bottom:16px">Mest efterspurgt</div>
+          <div style="display:grid;gap:12px">
+            <sc-for list="{{ topIdeas }}" as="t" hint-placeholder-count="5">
+              <div style="display:flex;gap:11px;align-items:baseline">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#C7F464;width:34px;flex:none">{{ t.score }}</span>
+                <span style="font-size:13.5px;font-weight:600;line-height:1.3">{{ t.title }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ sel }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeDrawer }}" style="position:fixed;inset:0;background:rgba(5,8,10,0.62);z-index:40;animation:fadein 0.16s ease-out"></div>
+    <aside style="position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);background:#0F1418;border-left:1px solid #26313A;z-index:41;overflow-y:auto;animation:slidein 0.2s cubic-bezier(0.2,0.8,0.2,1)">
+      <div style="padding:22px 26px;display:grid;gap:18px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="width:9px;height:9px;border-radius:50%;background:{{ sel.statusColor }}"></span>
+          <span style="font-size:11.5px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase">{{ sel.statusLabel }}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5E6E77">{{ sel.ref }}</span>
+          <button onClick="{{ closeDrawer }}" style="margin-left:auto;width:32px;height:32px;border-radius:8px;border:1px solid #26313A;background:#141A1F;color:#8A9AA2;cursor:pointer;font-size:15px;line-height:1" style-hover="color:#ECF2F0">✕</button>
+        </div>
+
+        <h2 style="margin:0;font-size:23px;font-weight:800;letter-spacing:-0.025em;line-height:1.2;text-wrap:pretty">{{ sel.title }}</h2>
+
+        <div style="display:flex;gap:7px;flex-wrap:wrap;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:#8A9AA2">
+          <span style="border:1px solid #26313A;border-radius:5px;padding:3px 8px;color:{{ sel.typeColor }}">{{ sel.typeLabel }}</span>
+          <span style="border:1px solid #26313A;border-radius:5px;padding:3px 8px">{{ sel.cat }}</span>
+          <span style="border:1px solid #26313A;border-radius:5px;padding:3px 8px">{{ sel.importance }}</span>
+          <span style="border:1px solid #26313A;border-radius:5px;padding:3px 8px">{{ sel.platform }}</span>
+        </div>
+
+        <p style="margin:0;font-size:14.5px;color:#C9D5DA;text-wrap:pretty;white-space:pre-line">{{ sel.body }}</p>
+
+        <div style="display:flex;align-items:center;gap:10px">
+          <button onClick="{{ sel.onUp }}" style="height:38px;padding:0 15px;border-radius:9px;cursor:pointer;font-weight:700;font-size:13.5px;border:1px solid #26313A;background:{{ sel.upBg }};color:{{ sel.upFg }}" style-hover="border-color:#3A4852">▲ Godt forslag · {{ sel.up }}</button>
+          <sc-if value="{{ allowDislike }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ sel.onDown }}" style="height:38px;padding:0 15px;border-radius:9px;cursor:pointer;font-weight:700;font-size:13.5px;border:1px solid #26313A;background:{{ sel.downBg }};color:{{ sel.downFg }}" style-hover="border-color:#3A4852">▼ {{ sel.down }}</button>
+          </sc-if>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#5E6E77;margin-left:auto">{{ sel.when }}</span>
+        </div>
+
+        <sc-if value="{{ sel.hasOfficial }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#141F12;border:1px solid #334A20;border-radius:12px;padding:14px 16px;display:grid;gap:6px">
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#C7F464">Svar fra holdet</div>
+            <div style="font-size:13.5px;color:#DCE8D9;text-wrap:pretty">{{ sel.official }}</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sel.isAdmin }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#10161A;border:1px solid #26313A;border-radius:12px;padding:15px 16px;display:grid;gap:12px">
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#F0B429">Admin</div>
+            <input value="{{ sel.title }}" onChange="{{ sel.onTitleEdit }}" placeholder="Titel" style="height:36px;padding:0 11px;border-radius:8px;border:1px solid #26313A;background:#141A1F;font-size:13.5px;width:100%" />
+            <textarea onChange="{{ sel.onBodyEdit }}" value="{{ sel.body }}" rows="3" placeholder="Beskrivelse" style="padding:9px 11px;border-radius:8px;border:1px solid #26313A;background:#141A1F;font-size:13.5px;resize:vertical;width:100%;font-family:Archivo,sans-serif"></textarea>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <select value="{{ sel.status }}" onChange="{{ sel.onStatusChange }}" style="height:36px;padding:0 10px;border-radius:8px;border:1px solid #26313A;background:#141A1F;font-size:13px;cursor:pointer">
+                <sc-for list="{{ statusOptions }}" as="s" hint-placeholder-count="8">
+                  <option value="{{ s.value }}">{{ s.label }}</option>
+                </sc-for>
+              </select>
+              <select value="{{ sel.cat }}" onChange="{{ sel.onCatChange }}" style="height:36px;padding:0 10px;border-radius:8px;border:1px solid #26313A;background:#141A1F;font-size:13px;cursor:pointer">
+                <sc-for list="{{ catOptions }}" as="c" hint-placeholder-count="8">
+                  <option value="{{ c.value }}">{{ c.label }}</option>
+                </sc-for>
+              </select>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <sc-for list="{{ sel.tags }}" as="t" hint-placeholder-count="2">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;border:1px solid #26313A;border-radius:5px;padding:3px 8px;display:flex;align-items:center;gap:7px">{{ t.label }}<button onClick="{{ t.onRemove }}" style="border:0;background:none;color:#5E6E77;cursor:pointer;padding:0;font-size:12px">✕</button></span>
+              </sc-for>
+              <input value="{{ tagDraft }}" onInput="{{ onTagDraft }}" onKeyDown="{{ onTagKey }}" placeholder="tilføj tag + Enter" style="height:30px;padding:0 10px;border-radius:7px;border:1px dashed #26313A;background:none;font-size:12.5px;width:170px" />
+            </div>
+            <textarea value="{{ officialDraft }}" onInput="{{ onOfficialDraft }}" rows="2" placeholder="Officielt svar til boardet…" style="padding:9px 11px;border-radius:8px;border:1px solid #26313A;background:#141A1F;font-size:13.5px;resize:vertical;width:100%;font-family:Archivo,sans-serif"></textarea>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button onClick="{{ sel.onSaveOfficial }}" style="height:34px;padding:0 14px;border-radius:8px;border:0;background:#C7F464;color:#0B0F12;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:#D9FF7C">Gem svar</button>
+              <button onClick="{{ sel.onHide }}" style="height:34px;padding:0 14px;border-radius:8px;border:1px solid #4A2222;background:#1C1111;color:#F87171;font-weight:600;font-size:13px;cursor:pointer" style-hover="border-color:#7A3333">{{ sel.hideLabel }}</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="border-top:1px solid #1E272E;padding-top:16px;display:grid;gap:13px">
+          <div style="font-size:11.5px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#8A9AA2">{{ sel.commentHeading }}</div>
+          <sc-for list="{{ sel.comments }}" as="c" hint-placeholder-count="2">
+            <div style="display:grid;gap:5px;background:#141A1F;border:1px solid #1E272E;border-radius:11px;padding:12px 14px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5E6E77">{{ c.author }} · {{ c.when }}</div>
+              <div style="font-size:13.5px;color:#C9D5DA;text-wrap:pretty">{{ c.text }}</div>
+            </div>
+          </sc-for>
+          <div style="display:grid;gap:9px">
+            <textarea value="{{ commentDraft }}" onInput="{{ onCommentDraft }}" rows="3" placeholder="Skriv en kommentar — du behøver ikke skrive hvem du er…" style="padding:10px 12px;border-radius:10px;border:1px solid #26313A;background:#141A1F;font-size:13.5px;resize:vertical;font-family:Archivo,sans-serif"></textarea>
+            <div style="display:flex;align-items:center;gap:10px">
+              <button onClick="{{ sel.onComment }}" style="height:36px;padding:0 16px;border-radius:9px;border:0;background:#C7F464;color:#0B0F12;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:#D9FF7C">Send kommentar</button>
+              <span style="font-size:11.5px;color:#5E6E77">Hold god tone. Vi fjerner grove kommentarer.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </sc-if>
+
+  <sc-if value="{{ formOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeForm }}" style="position:fixed;inset:0;background:rgba(5,8,10,0.7);z-index:50;animation:fadein 0.16s ease-out"></div>
+    <div style="position:fixed;inset:0;z-index:51;display:grid;place-items:start center;padding:28px 18px;overflow-y:auto;pointer-events:none">
+      <div style="pointer-events:auto;width:min(620px,100%);background:#0F1418;border:1px solid #26313A;border-radius:16px;padding:24px 26px;display:grid;gap:16px;animation:fadein 0.18s ease-out">
+        <div style="display:flex;align-items:flex-start;gap:12px">
+          <div>
+            <div style="font-size:20px;font-weight:800;letter-spacing:-0.02em">Indsend et forslag</div>
+            <div style="font-size:13px;color:#8A9AA2;margin-top:4px">Jo mere du skriver, jo nemmere er det at vurdere. Ingen login — vi gemmer ikke hvem du er.</div>
+          </div>
+          <button onClick="{{ closeForm }}" style="margin-left:auto;width:32px;height:32px;flex:none;border-radius:8px;border:1px solid #26313A;background:#141A1F;color:#8A9AA2;cursor:pointer;font-size:15px;line-height:1" style-hover="color:#ECF2F0">✕</button>
+        </div>
+
+        <label style="display:grid;gap:6px">
+          <span style="font-size:11.5px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#8A9AA2">Titel</span>
+          <input value="{{ f.title }}" onInput="{{ onFTitle }}" placeholder="Kort og konkret — fx “Kopiér opstilling fra sidste kamp”" style="height:40px;padding:0 12px;border-radius:9px;border:1px solid #26313A;background:#141A1F;font-size:14px" />
+        </label>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+          <label style="display:grid;gap:6px">
+            <span style="font-size:11.5px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#8A9AA2">Område i spillet</span>
+            <select value="{{ f.cat }}" onChange="{{ onFCat }}" style="height:40px;padding:0 11px;border-radius:9px;border:1px solid #26313A;background:#141A1F;font-size:14px;cursor:pointer">
+              <sc-for list="{{ catOptions }}" as="c" hint-placeholder-count="8">
+                <option value="{{ c.value }}">{{ c.label }}</option>
+              </sc-for>
+            </select>
+          </label>
+          <label style="display:grid;gap:6px">
+            <span style="font-size:11.5px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#8A9AA2">Hvad er det?</span>
+            <select value="{{ f.type }}" onChange="{{ onFType }}" style="height:40px;padding:0 11px;border-radius:9px;border:1px solid #26313A;background:#141A1F;font-size:14px;cursor:pointer">
+              <sc-for list="{{ typeOptions }}" as="t" hint-placeholder-count="3">
+                <option value="{{ t.value }}">{{ t.label }}</option>
+              </sc-for>
+            </select>
+          </label>
+        </div>
+
+        <label style="display:grid;gap:6px">
+          <span style="font-size:11.5px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#8A9AA2">Beskriv det</span>
+          <textarea value="{{ f.body }}" onInput="{{ onFBody }}" rows="5" placeholder="Hvad oplever du i dag, hvad ville du hellere have, og hvornår sker det? Skriv gerne et eksempel fra en konkret kamp eller sæson." style="padding:11px 12px;border-radius:9px;border:1px solid #26313A;background:#141A1F;font-size:14px;resize:vertical;font-family:Archivo,sans-serif"></textarea>
+        </label>
+
+        <div style="display:grid;gap:7px">
+          <span style="font-size:11.5px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#8A9AA2">Hvor vigtigt er det for dig?</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <sc-for list="{{ importanceOptions }}" as="o" hint-placeholder-count="3">
+              <button onClick="{{ o.onClick }}" style="height:36px;padding:0 14px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;border:1px solid {{ o.border }};background:{{ o.bg }};color:{{ o.fg }}">{{ o.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+          <label style="display:grid;gap:6px">
+            <span style="font-size:11.5px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#8A9AA2">Dit managernavn <span style="color:#5E6E77;font-weight:500;letter-spacing:0">valgfrit</span></span>
+            <input value="{{ f.author }}" onInput="{{ onFAuthor }}" placeholder="fx. FC Vestbjerg" style="height:40px;padding:0 12px;border-radius:9px;border:1px solid #26313A;background:#141A1F;font-size:14px" />
+          </label>
+          <label style="display:grid;gap:6px">
+            <span style="font-size:11.5px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#8A9AA2">Hvor spiller du?</span>
+            <select value="{{ f.platform }}" onChange="{{ onFPlatform }}" style="height:40px;padding:0 11px;border-radius:9px;border:1px solid #26313A;background:#141A1F;font-size:14px;cursor:pointer">
+              <sc-for list="{{ platformOptions }}" as="p" hint-placeholder-count="4">
+                <option value="{{ p.value }}">{{ p.label }}</option>
+              </sc-for>
+            </select>
+          </label>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-top:1px solid #1E272E;padding-top:16px">
+          <button onClick="{{ submit }}" style="height:42px;padding:0 20px;border-radius:10px;border:0;background:#C7F464;color:#0B0F12;font-weight:700;font-size:14.5px;cursor:pointer" style-hover="background:#D9FF7C">Send forslag</button>
+          <span style="font-size:12.5px;color:#8A9AA2;flex:1 1 200px;text-wrap:pretty">{{ submitNote }}</span>
+        </div>
+        <sc-if value="{{ formError }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:13px;color:#F87171">{{ formError }}</div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:60;background:#C7F464;color:#0B0F12;font-weight:700;font-size:13.5px;padding:12px 18px;border-radius:10px;animation:fadein 0.18s ease-out;box-shadow:0 10px 30px rgba(0,0,0,0.45)">{{ toast }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;gameName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Online Fodbold Manager&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;requireApproval&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Regler&quot;},&quot;allowDislike&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Regler&quot;}}">
+class Component extends DCLogic {
+  CATS = ['Træning','Transfermarked','Kampsimulering','Økonomi','Ungdomsakademi','Landshold','Turneringer','App & Mobil'];
+  TYPES = [
+    { value: 'ide', label: 'Idé', color: '#6EA8FF', bg: '#111C2B' },
+    { value: 'forbedring', label: 'Forbedring', color: '#C7F464', bg: '#17200D' },
+    { value: 'bug', label: 'Bug', color: '#F87171', bg: '#251212' }
+  ];
+  STATUSES = [
+    { value: 'nye', label: 'Nye forslag', color: '#6EA8FF' },
+    { value: 'vurdering', label: 'Under vurdering', color: '#F0B429' },
+    { value: 'planlagt', label: 'Planlagt', color: '#A78BFA' },
+    { value: 'udvikling', label: 'I udvikling', color: '#C7F464' },
+    { value: 'test', label: 'Under test', color: '#38BDF8' },
+    { value: 'udgivet', label: 'Udgivet', color: '#34D399' },
+    { value: 'afvist', label: 'Afvist', color: '#F87171', archive: true },
+    { value: 'pause', label: 'På pause', color: '#8A9AA2', archive: true }
+  ];
+  IMPORTANCE = ['Nice to have','Vigtigt','Kritisk for mig'];
+  PLATFORMS = ['Web','iOS-app','Android-app','Begge'];
+
+  seed = [
+    { id: 41, title: 'Taktikændringer live under kampen', body: 'I dag skal jeg sætte taktikken før kampstart og så kan jeg intet gøre. Når vi er bagud 0-1 i 60. minut vil jeg kunne skifte til offensiv presspil og lave et indskift — ligesom en rigtig manager gør fra sidelinjen.', cat: 'Kampsimulering', type: 'forbedring', imp: 'Kritisk for mig', author: 'Anonym manager', platform: 'Web', status: 'udvikling', up: 412, down: 9, when: '3 uger siden', tags: ['sæson 12'], official: 'Vi bygger den nu. Første version giver to skift og ét taktikskifte pr. kamp.', comments: [ { id: 1, author: 'Anonym', when: '2 uger siden', text: 'Ja tak. Det er den eneste grund til at jeg ikke ser mine kampe live.' }, { id: 2, author: 'FC Vestbjerg', when: '9 dage siden', text: 'Håber der kommer en grænse på antal skift, ellers bliver det kaos.' } ] },
+    { id: 38, title: 'Individuelle træningsprogrammer pr. spiller', body: 'Hele truppen træner det samme. Jeg vil kunne give min unge back et program med fokus på tacklinger og udholdenhed, mens angriberen træner afslutninger.', cat: 'Træning', type: 'ide', imp: 'Vigtigt', author: 'Anonym manager', platform: 'Web', status: 'planlagt', up: 288, down: 14, when: '1 måned siden', tags: [], official: 'Planlagt til efter kampmotoren. Vi regner med 4-6 fokusområder pr. spiller.', comments: [ { id: 3, author: 'Anonym', when: '3 uger siden', text: 'Vigtigt at det ikke bliver mikro-styring man SKAL lave hver dag.' } ] },
+    { id: 52, title: 'Transferbudget kan ikke fordeles på lejeaftaler', body: 'Når jeg låner en spiller med lønandel, trækkes hele beløbet fra transferbudgettet i stedet for lønbudgettet. Det gør det umuligt at planlægge en sæson.', cat: 'Transfermarked', type: 'bug', imp: 'Kritisk for mig', author: 'Anonym manager', platform: 'Web', status: 'vurdering', up: 96, down: 1, when: '6 dage siden', tags: ['økonomi'], official: '', comments: [ { id: 4, author: 'Anonym', when: '4 dage siden', text: 'Kan bekræfte. Sker også ved lån uden købsoption.' } ] },
+    { id: 55, title: 'Se scoutrapport før jeg skriver ungdomskontrakt', body: 'Lige nu underskriver jeg i blinde og opdager først potentialet bagefter. Giv mig en rapport med usikkerhedsmargin — så bliver akademiet et rigtigt valg.', cat: 'Ungdomsakademi', type: 'ide', imp: 'Vigtigt', author: 'Akademi-Anders', platform: 'Web', status: 'nye', up: 74, down: 3, when: '2 dage siden', tags: [], official: '', comments: [] },
+    { id: 57, title: 'Skadesrisiko vises før jeg vælger træningspas', body: 'Hård fysisk træning dagen før en cupkamp koster mig spillere. Vis en risikoindikator pr. spiller inden jeg vælger intensitet.', cat: 'Træning', type: 'forbedring', imp: 'Vigtigt', author: 'Anonym manager', platform: 'Web', status: 'nye', up: 51, down: 2, when: '1 dag siden', tags: [], official: '', comments: [] },
+    { id: 58, title: 'Sponsorforhandling med flere konkurrerende tilbud', body: 'I dag er der ét sponsortilbud man siger ja eller nej til. Lad mig forhandle mellem 2-3 sponsorer med forskellige bonusstrukturer: pengene nu, eller mere ved oprykning.', cat: 'Økonomi', type: 'ide', imp: 'Nice to have', author: 'Anonym manager', platform: 'Web', status: 'nye', up: 33, down: 6, when: '4 dage siden', tags: [], official: '', comments: [] },
+    { id: 47, title: 'Landsholdspause skal fryse klubtræningen', body: 'Mine landsholdsspillere tæller stadig med i klubtræningen mens de er væk, så holdmoralen bliver regnet forkert i den uge.', cat: 'Landshold', type: 'bug', imp: 'Vigtigt', author: 'Anonym manager', platform: 'Web', status: 'test', up: 121, down: 2, when: '2 uger siden', tags: ['sæson 12'], official: 'Rettet — ligger i test og kommer med næste opdatering.', comments: [] },
+    { id: 44, title: 'xG pr. spiller over hele sæsonen', body: 'Kampreferatet viser xG for kampen, men jeg kan ikke se om min angriber overperformer på sæsonen. Giv mig en graf pr. spiller med xG mod faktiske mål.', cat: 'Kampsimulering', type: 'ide', imp: 'Nice to have', author: 'Statistik-Søren', platform: 'Web', status: 'planlagt', up: 164, down: 11, when: '5 uger siden', tags: ['statistik'], official: '', comments: [ { id: 5, author: 'Anonym', when: '2 uger siden', text: 'Og gerne kunne eksporteres, så vi kan lave ligastatistik i vores forbund.' } ] },
+    { id: 49, title: 'Kopiér opstilling fra sidste kamp', body: 'Jeg sætter det samme hold op manuelt hver gang. En knap der henter sidste kamps opstilling og roller ville spare mig fem minutter dagligt.', cat: 'Kampsimulering', type: 'forbedring', imp: 'Vigtigt', author: 'Anonym manager', platform: 'iOS-app', status: 'udvikling', up: 203, down: 4, when: '3 uger siden', tags: [], official: '', comments: [] },
+    { id: 46, title: 'Turneringsbracket i fuld skærm på mobil', body: 'Bracketen kan ikke læses på telefon — man kan kun se to kampe ad gangen og kan ikke zoome ud.', cat: 'Turneringer', type: 'bug', imp: 'Vigtigt', author: 'Anonym manager', platform: 'Android-app', status: 'vurdering', up: 88, down: 1, when: '10 dage siden', tags: ['mobil'], official: '', comments: [] },
+    { id: 22, title: 'Advarsel 6 måneder før kontraktudløb', body: 'Jeg mistede to stamspillere gratis fordi der ingen varsel var. En notifikation ved 6 og 3 måneder ville være nok.', cat: 'Økonomi', type: 'forbedring', imp: 'Kritisk for mig', author: 'Anonym manager', platform: 'Web', status: 'udgivet', up: 341, down: 7, when: '4 måneder siden', tags: [], official: 'Udgivet i sæson 11. Varsel ved 6, 3 og 1 måned.', comments: [] },
+    { id: 19, title: 'Push-besked når min kamp starter', body: 'Jeg vil have en notifikation 5 minutter før kampstart, så jeg kan følge den live.', cat: 'App & Mobil', type: 'forbedring', imp: 'Vigtigt', author: 'Anonym manager', platform: 'iOS-app', status: 'udgivet', up: 276, down: 12, when: '6 måneder siden', tags: ['mobil'], official: 'Udgivet. Kan slås til under Indstillinger → Notifikationer.', comments: [] },
+    { id: 31, title: 'Mørkt tema i appen', body: 'Appen lyser mig i ansigtet når jeg tjekker mit hold om aftenen.', cat: 'App & Mobil', type: 'ide', imp: 'Nice to have', author: 'Anonym manager', platform: 'Android-app', status: 'afvist', up: 61, down: 34, when: '3 måneder siden', tags: [], official: 'Vi laver et samlet designløft senere — derfor ikke et separat tema nu.', comments: [] },
+    { id: 35, title: 'Auto-opstilling under ferie-tilstand', body: 'Når jeg er på ferie i to uger spiller jeg med 10 mand. Lad systemet vælge bedste 11 efter form.', cat: 'Træning', type: 'ide', imp: 'Vigtigt', author: 'Anonym manager', platform: 'Web', status: 'pause', up: 148, down: 29, when: '2 måneder siden', tags: [], official: 'På pause: vi er i tvivl om det gør konkurrencen mere skæv.', comments: [] }
+  ];
+  seedPending = [
+    { id: 61, title: 'Byt spillere direkte mellem to managere', body: 'To managere burde kunne aftale et bytte af spillere uden at gå gennem transfermarkedet — evt. med pengeudligning.', cat: 'Transfermarked', type: 'ide', imp: 'Vigtigt', author: 'Anonym', platform: 'Web', when: 'i dag, 09:14', similar: 'Transferbudget kan ikke fordeles på lejeaftaler' },
+    { id: 62, title: 'Kampreferatet er for langt', body: 'Der står 40 linjer om en 1-0 kamp. Giv mig en kort version med kun mål, chancer og kort.', cat: 'Kampsimulering', type: 'forbedring', imp: 'Nice to have', author: 'Anonym', platform: 'iOS-app', when: 'i dag, 08:02', similar: '' },
+    { id: 63, title: 'Tilføj kvindeligaer', body: 'Jeg vil kunne styre en kvindeklub med egne ligaer og landshold.', cat: 'Turneringer', type: 'ide', imp: 'Vigtigt', author: 'Anonym', platform: 'Web', when: 'i går, 21:40', similar: '' }
+  ];
+
+  state = {
+    view: 'board', adminTab: 'board',
+    ideas: this.seed.map(i => Object.assign({ approved: true, hidden: false, myVote: 0 }, i)),
+    pending: this.seedPending.slice(),
+    cat: '', type: 'alle', sort: 'stemmer', query: '',
+    archiveOpen: false, selId: null, dragId: null,
+    formOpen: false, formError: '', toast: '',
+    form: { title: '', body: '', cat: 'Kampsimulering', type: 'ide', imp: 'Vigtigt', author: '', platform: 'Web' },
+    commentDraft: '', officialDraft: '', tagDraft: '', nextId: 64, nextCommentId: 100
+  };
+
+  status = v => this.STATUSES.find(s => s.value === v) || this.STATUSES[0];
+  typeOf = v => this.TYPES.find(t => t.value === v) || this.TYPES[0];
+  patch(id, fn) {
+    this.setState(s => ({ ideas: s.ideas.map(i => i.id === id ? Object.assign({}, i, typeof fn === 'function' ? fn(i) : fn) : i) }));
+  }
+  flash(msg) {
+    clearTimeout(this._t);
+    this.setState({ toast: msg });
+    this._t = setTimeout(() => this.setState({ toast: '' }), 2600);
+  }
+  vote(id, dir) {
+    this.patch(id, i => {
+      const was = i.myVote;
+      if (was === dir) return { myVote: 0, up: i.up - (dir === 1 ? 1 : 0), down: i.down - (dir === -1 ? 1 : 0) };
+      return {
+        myVote: dir,
+        up: i.up + (dir === 1 ? 1 : 0) - (was === 1 ? 1 : 0),
+        down: i.down + (dir === -1 ? 1 : 0) - (was === -1 ? 1 : 0)
+      };
+    });
+  }
+  openIdea(id) {
+    const i = this.state.ideas.find(x => x.id === id);
+    this.setState({ selId: id, commentDraft: '', officialDraft: i ? (i.official || '') : '', tagDraft: '' });
+  }
+  card(i, admin) {
+    const t = this.typeOf(i.type);
+    return Object.assign({}, i, {
+      ref: '#' + i.id,
+      typeLabel: t.label, typeColor: t.color, typeBg: t.bg,
+      metaLine: i.cat + ' · ' + i.platform,
+      commentCount: i.comments.filter(c => !c.hidden).length,
+      hasOfficial: !!i.official,
+      draggable: !!admin,
+      onDragStart: () => this.setState({ dragId: i.id }),
+      onOpen: () => this.openIdea(i.id),
+      onUp: e => { e.stopPropagation(); this.vote(i.id, 1); },
+      onDown: e => { e.stopPropagation(); this.vote(i.id, -1); },
+      upBg: i.myVote === 1 ? '#C7F464' : '#10161A',
+      upFg: i.myVote === 1 ? '#0B0F12' : '#B4C2C7',
+      downBg: i.myVote === -1 ? '#F87171' : '#10161A',
+      downFg: i.myVote === -1 ? '#0B0F12' : '#8A9AA2'
+    });
+  }
+  visible(admin) {
+    const st = this.state;
+    const q = st.query.trim().toLowerCase();
+    return st.ideas.filter(i => i.approved && (admin || !i.hidden)).filter(i => {
+      if (admin) return true;
+      if (st.cat && i.cat !== st.cat) return false;
+      if (st.type !== 'alle' && i.type !== st.type) return false;
+      if (q && (i.title + ' ' + i.body).toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+  }
+  sorted(list) {
+    const s = this.state.sort;
+    const a = list.slice();
+    if (s === 'nyeste') return a.sort((x, y) => y.id - x.id);
+    if (s === 'kommentarer') return a.sort((x, y) => y.comments.length - x.comments.length);
+    return a.sort((x, y) => (y.up - y.down) - (x.up - x.down));
+  }
+  columnsFor(statuses, admin) {
+    const list = this.sorted(this.visible(admin));
+    return statuses.map(s => {
+      const items = list.filter(i => i.status === s.value).map(i => this.card(i, admin));
+      return {
+        key: s.value, label: s.label, color: s.color, count: items.length, items, empty: items.length === 0,
+        dropBg: this.state.dragId ? '#111A14' : 'transparent',
+        dropBorder: this.state.dragId ? '#3E5C33' : '#1E272E',
+        onDragOver: e => e.preventDefault(),
+        onDrop: e => {
+          e.preventDefault();
+          const id = this.state.dragId;
+          if (!id) return;
+          this.setState({ dragId: null });
+          this.patch(id, { status: s.value });
+          this.flash('#' + id + ' flyttet til ' + s.label);
+        }
+      };
+    });
+  }
+
+  renderVals() {
+    const st = this.state;
+    const p = this.props;
+    const requireApproval = p.requireApproval !== false;
+    const allowDislike = p.allowDislike !== false;
+    const main = this.STATUSES.filter(s => !s.archive);
+    const archive = this.STATUSES.filter(s => s.archive);
+    const pub = this.visible(false);
+    const all = st.ideas.filter(i => i.approved);
+    const sel = st.ideas.find(i => i.id === st.selId);
+    const chip = on => ({ bg: on ? '#C7F464' : '#141A1F', fg: on ? '#0B0F12' : '#B4C2C7', border: on ? '#C7F464' : '#26313A' });
+    const catCounts = this.CATS.map(c => ({ label: c, value: all.filter(i => i.cat === c).length }));
+    const catMax = Math.max.apply(null, catCounts.map(c => c.value).concat([1]));
+    const statusCounts = this.STATUSES.map(s => ({ label: s.label, color: s.color, value: all.filter(i => i.status === s.value).length }));
+    const statusMax = Math.max.apply(null, statusCounts.map(s => s.value).concat([1]));
+
+    return {
+      gameName: p.gameName || 'Online Fodbold Manager',
+      allowDislike,
+      isBoard: st.view === 'board', isAdmin: st.view === 'admin',
+      viewBarColor: st.view === 'admin' ? '#F0B429' : '#C7F464',
+      goBoard: () => this.setState({ view: 'board' }),
+      goAdmin: () => this.setState({ view: 'admin' }),
+      query: st.query, onQuery: e => this.setState({ query: e.target.value }),
+      pendingCount: st.pending.length,
+
+      stats: [
+        { label: 'Åbne forslag', value: all.filter(i => ['nye','vurdering','planlagt'].indexOf(i.status) > -1).length, color: '#6EA8FF' },
+        { label: 'I udvikling', value: all.filter(i => ['udvikling','test'].indexOf(i.status) > -1).length, color: '#C7F464' },
+        { label: 'Udgivet', value: all.filter(i => i.status === 'udgivet').length, color: '#34D399' },
+        { label: 'Stemmer i alt', value: all.reduce((n, i) => n + i.up + i.down, 0), color: '#ECF2F0' }
+      ],
+
+      cats: [{ label: 'Alle områder', value: '' }].concat(this.CATS.map(c => ({ label: c, value: c })))
+        .map(c => Object.assign({ label: c.label, onClick: () => this.setState({ cat: c.value }) }, chip(st.cat === c.value))),
+      types: [{ label: 'Alt', value: 'alle' }].concat(this.TYPES.map(t => ({ label: t.label, value: t.value })))
+        .map(t => ({ label: t.label, onClick: () => this.setState({ type: t.value }), bg: st.type === t.value ? '#26313A' : 'transparent', fg: st.type === t.value ? '#ECF2F0' : '#8A9AA2' })),
+      sort: st.sort, onSort: e => this.setState({ sort: e.target.value }),
+      sortOptions: [{ value: 'stemmer', label: 'Flest stemmer' }, { value: 'nyeste', label: 'Nyeste først' }, { value: 'kommentarer', label: 'Mest omdiskuteret' }],
+
+      columns: this.columnsFor(main, false),
+      archiveColumns: this.columnsFor(archive, false),
+      archiveOpen: st.archiveOpen,
+      archiveLabel: (st.archiveOpen ? 'Skjul arkiv' : 'Vis arkiv') + ' (' + pub.filter(i => this.status(i.status).archive).length + ')',
+      toggleArchive: () => this.setState({ archiveOpen: !st.archiveOpen }),
+
+      adminTabs: [
+        { value: 'board', label: 'Board', badge: '' },
+        { value: 'queue', label: 'Kø', badge: st.pending.length },
+        { value: 'comments', label: 'Kommentarer', badge: all.reduce((n, i) => n + i.comments.length, 0) },
+        { value: 'stats', label: 'Statistik', badge: '' }
+      ].map(t => ({ label: t.label, badge: t.badge, onClick: () => this.setState({ adminTab: t.value }), bg: st.adminTab === t.value ? '#26313A' : 'transparent', fg: st.adminTab === t.value ? '#ECF2F0' : '#8A9AA2' })),
+      tabIsBoard: st.adminTab === 'board', tabIsQueue: st.adminTab === 'queue',
+      tabIsComments: st.adminTab === 'comments', tabIsStats: st.adminTab === 'stats',
+      adminColumns: this.columnsFor(this.STATUSES, true),
+
+      pending: st.pending.map(x => ({
+        title: x.title, body: x.body, ref: '#' + x.id, when: x.when, cat: x.cat,
+        typeLabel: this.typeOf(x.type).label, importance: x.imp, platform: x.platform,
+        author: x.author, hasSimilar: !!x.similar, similarTitle: x.similar,
+        onApprove: () => {
+          this.setState(s => ({
+            pending: s.pending.filter(q => q.id !== x.id),
+            ideas: s.ideas.concat([Object.assign({}, x, { approved: true, hidden: false, myVote: 0, status: 'nye', up: 1, down: 0, tags: [], official: '', comments: [], when: 'i dag' })])
+          }));
+          this.flash('#' + x.id + ' er nu synlig på boardet');
+        },
+        onReject: () => {
+          this.setState(s => ({
+            pending: s.pending.filter(q => q.id !== x.id),
+            ideas: s.ideas.concat([Object.assign({}, x, { approved: true, hidden: false, myVote: 0, status: 'afvist', up: 0, down: 0, tags: [], official: '', comments: [], when: 'i dag' })])
+          }));
+          this.flash('#' + x.id + ' lagt i arkivet som afvist');
+        },
+        onMerge: () => {
+          this.setState(s => ({ pending: s.pending.filter(q => q.id !== x.id) }));
+          this.flash('#' + x.id + ' flettet som dublet');
+        }
+      })),
+      noPending: st.pending.length === 0,
+
+      allComments: all.reduce((acc, i) => acc.concat(i.comments.map(c => ({
+        on: '#' + i.id + ' ' + i.title, author: c.author, when: c.when,
+        text: c.hidden ? '[skjult] ' + c.text : c.text,
+        textColor: c.hidden ? '#5E6E77' : '#C9D5DA',
+        action: c.hidden ? 'Vis igen' : 'Skjul',
+        onToggle: () => this.patch(i.id, o => ({ comments: o.comments.map(y => y.id === c.id ? Object.assign({}, y, { hidden: !y.hidden }) : y) }))
+      }))), []),
+
+      catBars: catCounts.map(c => ({ label: c.label, value: c.value, width: Math.round(c.value / catMax * 100) + '%' })),
+      statusBars: statusCounts.map(s => ({ label: s.label, value: s.value, color: s.color, width: Math.round(s.value / statusMax * 100) + '%' })),
+      topIdeas: all.slice().sort((a, b) => (b.up - b.down) - (a.up - a.down)).slice(0, 6).map(i => ({ score: i.up - i.down, title: i.title })),
+
+      statusOptions: this.STATUSES.map(s => ({ value: s.value, label: s.label })),
+      catOptions: this.CATS.map(c => ({ value: c, label: c })),
+      typeOptions: this.TYPES.map(t => ({ value: t.value, label: t.label })),
+      platformOptions: this.PLATFORMS.map(x => ({ value: x, label: x })),
+
+      closeDrawer: () => this.setState({ selId: null }),
+      commentDraft: st.commentDraft, onCommentDraft: e => this.setState({ commentDraft: e.target.value }),
+      officialDraft: st.officialDraft, onOfficialDraft: e => this.setState({ officialDraft: e.target.value }),
+      tagDraft: st.tagDraft, onTagDraft: e => this.setState({ tagDraft: e.target.value }),
+      onTagKey: e => {
+        if (e.key !== 'Enter' || !e.target.value.trim() || !sel) return;
+        const v = e.target.value.trim();
+        this.patch(sel.id, o => ({ tags: o.tags.concat([v]) }));
+        this.setState({ tagDraft: '' });
+      },
+
+      sel: sel ? Object.assign({}, this.card(sel, false), {
+        statusLabel: this.status(sel.status).label,
+        statusColor: this.status(sel.status).color,
+        importance: sel.imp,
+        isAdmin: st.view === 'admin',
+        hideLabel: sel.hidden ? 'Vis på boardet igen' : 'Skjul fra boardet',
+        commentHeading: sel.comments.filter(c => !c.hidden).length + ' kommentarer',
+        comments: sel.comments.filter(c => !c.hidden),
+        tags: sel.tags.map((t, n) => ({ label: t, onRemove: () => this.patch(sel.id, o => ({ tags: o.tags.filter((_, k) => k !== n) })) })),
+        onTitleEdit: e => this.patch(sel.id, { title: e.target.value }),
+        onBodyEdit: e => this.patch(sel.id, { body: e.target.value }),
+        onStatusChange: e => { this.patch(sel.id, { status: e.target.value }); this.flash('Status opdateret'); },
+        onCatChange: e => this.patch(sel.id, { cat: e.target.value }),
+        onSaveOfficial: () => { this.patch(sel.id, { official: st.officialDraft }); this.flash('Svaret er nu synligt på kortet'); },
+        onHide: () => { this.patch(sel.id, { hidden: !sel.hidden }); this.flash(sel.hidden ? 'Synlig igen' : 'Skjult fra boardet'); },
+        onComment: () => {
+          const text = st.commentDraft.trim();
+          if (!text) return;
+          const cid = st.nextCommentId;
+          this.patch(sel.id, o => ({ comments: o.comments.concat([{ id: cid, author: 'Dig (anonym)', when: 'lige nu', text }]) }));
+          this.setState({ commentDraft: '', nextCommentId: cid + 1 });
+        }
+      }) : null,
+
+      formOpen: st.formOpen, formError: st.formError,
+      openForm: () => this.setState({ formOpen: true, formError: '' }),
+      closeForm: () => this.setState({ formOpen: false }),
+      f: st.form,
+      onFTitle: e => this.setState(s => ({ form: Object.assign({}, s.form, { title: e.target.value }) })),
+      onFBody: e => this.setState(s => ({ form: Object.assign({}, s.form, { body: e.target.value }) })),
+      onFCat: e => this.setState(s => ({ form: Object.assign({}, s.form, { cat: e.target.value }) })),
+      onFType: e => this.setState(s => ({ form: Object.assign({}, s.form, { type: e.target.value }) })),
+      onFAuthor: e => this.setState(s => ({ form: Object.assign({}, s.form, { author: e.target.value }) })),
+      onFPlatform: e => this.setState(s => ({ form: Object.assign({}, s.form, { platform: e.target.value }) })),
+      importanceOptions: this.IMPORTANCE.map(o => Object.assign({ label: o, onClick: () => this.setState(s => ({ form: Object.assign({}, s.form, { imp: o }) })) }, chip(st.form.imp === o))),
+      submitNote: requireApproval
+        ? 'Vi læser alle forslag igennem inden de kommer på boardet — typisk inden for et døgn.'
+        : 'Dit forslag kommer direkte på boardet under “Nye forslag”.',
+      submit: () => {
+        const f = st.form;
+        if (!f.title.trim() || f.body.trim().length < 20) {
+          this.setState({ formError: 'Skriv en titel og mindst et par linjer beskrivelse — ellers kan vi ikke vurdere det.' });
+          return;
+        }
+        const id = st.nextId;
+        const rec = { id, title: f.title.trim(), body: f.body.trim(), cat: f.cat, type: f.type, imp: f.imp, author: f.author.trim() || 'Anonym', platform: f.platform, when: 'i dag' };
+        if (requireApproval) {
+          this.setState(s => ({ pending: [Object.assign({ similar: '' }, rec)].concat(s.pending) }));
+        } else {
+          this.setState(s => ({ ideas: s.ideas.concat([Object.assign({}, rec, { approved: true, hidden: false, myVote: 0, status: 'nye', up: 1, down: 0, tags: [], official: '', comments: [] })]) }));
+        }
+        this.setState({
+          formOpen: false, nextId: id + 1, formError: '',
+          form: { title: '', body: '', cat: 'Kampsimulering', type: 'ide', imp: 'Vigtigt', author: '', platform: 'Web' }
+        });
+        this.flash(requireApproval ? 'Tak! Forslaget er sendt til gennemsyn' : 'Tak! Forslaget ligger nu på boardet');
+      },
+      toast: st.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

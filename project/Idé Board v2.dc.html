@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; background: #EFEEE7; }
+  input, textarea, select, button { font-family: Verdana, Tahoma, Geneva, sans-serif; color: #333; }
+  input:focus, textarea:focus, select:focus { outline: 2px solid #FFFFFF; outline-offset: 0; }
+  a { color: #4A7A0F; text-decoration: none; font-weight: bold; }
+  a:hover { color: #6BA524; text-decoration: underline; }
+  ::placeholder { color: #767669; }
+  @keyframes fadein { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes popin { from { opacity: 0; transform: translateY(-8px) } to { opacity: 1; transform: none } }
+</style>
+</helmet>
+<div style="min-height:100vh;background:#EFEEE7;color:#333333;font-family:Verdana,Tahoma,Geneva,sans-serif;font-size:13px;line-height:1.5">
+
+  <div style="background:linear-gradient(#93CB45,#69A221);border-bottom:2px solid #4E7A16;box-shadow:inset 0 1px 0 #B4DE72">
+    <div style="max-width:1400px;margin:0 auto;padding:0 18px;display:flex;align-items:stretch;gap:4px;flex-wrap:wrap;min-height:44px">
+      <div style="display:flex;align-items:center;gap:9px;padding-right:18px">
+        <div style="width:26px;height:26px;border-radius:4px;background:#FFFFFF;color:#4E7A16;display:grid;place-items:center;font-weight:bold;font-size:12px;border:1px solid #4E7A16">ID</div>
+        <div style="color:#FFFFFF;font-weight:bold;font-size:14px;text-shadow:0 1px 0 rgba(0,0,0,0.3);line-height:1.15">idé<br />board</div>
+      </div>
+      <div style="display:flex;align-items:center;background:rgba(0,0,0,0.2);padding:0 15px;color:#FFFFFF;font-weight:bold;font-size:13.5px;text-shadow:0 1px 0 rgba(0,0,0,0.3)">Brættet</div>
+      <div style="flex:1 1 20px"></div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 0">
+        <input value="{{ query }}" onInput="{{ onQuery }}" placeholder="Søg i idéer…" style="height:28px;padding:0 9px;border:1px solid #4E7A16;border-radius:3px;background:#FFFFFF;font-size:12.5px;width:180px" />
+        <button onClick="{{ openForm }}" style="height:28px;padding:0 14px;cursor:pointer;border:1px solid #A8730F;border-radius:4px;background:linear-gradient(#EFB055,#D08A17);color:#FFFFFF;font-weight:bold;font-size:12.5px;text-shadow:0 1px 0 rgba(0,0,0,0.35)" style-hover="background:linear-gradient(#F6BE6B,#DC9620)">Indsend idé</button>
+      </div>
+    </div>
+    <div style="background:rgba(0,0,0,0.32);border-top:1px solid rgba(255,255,255,0.22)">
+      <div style="max-width:1400px;margin:0 auto;padding:7px 18px;display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+        <span style="color:#FFFFFF;font-size:12px;font-weight:bold;text-shadow:0 1px 0 rgba(0,0,0,0.3)">Område</span>
+        <select value="{{ cat }}" onChange="{{ onCat }}" style="height:26px;padding:0 6px;border:1px solid #4E7A16;border-radius:3px;background:#FFFFFF;font-size:12px;cursor:pointer;max-width:290px">
+          <sc-for list="{{ catFilterOptions }}" as="c" hint-placeholder-count="9">
+            <option value="{{ c.value }}">{{ c.label }}</option>
+          </sc-for>
+        </select>
+        <span style="color:#FFFFFF;font-size:12px;font-weight:bold;text-shadow:0 1px 0 rgba(0,0,0,0.3);margin-left:8px">Sortér</span>
+        <select value="{{ sort }}" onChange="{{ onSort }}" style="height:26px;padding:0 6px;border:1px solid #4E7A16;border-radius:3px;background:#FFFFFF;font-size:12px;cursor:pointer">
+          <sc-for list="{{ sortOptions }}" as="o" hint-placeholder-count="3">
+            <option value="{{ o.value }}">{{ o.label }}</option>
+          </sc-for>
+        </select>
+        <div style="flex:1 1 10px"></div>
+        <span style="color:#FFFFFF;font-size:12px;text-shadow:0 1px 0 rgba(0,0,0,0.3)">{{ countLine }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:1400px;margin:0 auto;padding:16px 18px 28px">
+
+      <div style="display:flex;gap:11px;overflow-x:auto;padding-bottom:10px;align-items:flex-start">
+        <sc-for list="{{ columns }}" as="col" hint-placeholder-count="6">
+          <div style="flex:0 0 258px;border:1px solid #D5D4CB;border-radius:4px;background:#F7F7F2;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,0.06)">
+            <div style="height:3px;background:{{ col.color }}"></div>
+            <div style="background:linear-gradient(#59A3D8,#1E6199);padding:7px 9px;display:flex;align-items:center;gap:7px;border-bottom:1px solid #1C5E96">
+              <span style="width:9px;height:9px;border-radius:50%;flex:none;background:{{ col.color }};border:1px solid rgba(0,0,0,0.25)"></span>
+              <span style="color:#FFFFFF;font-weight:bold;font-size:12.5px;text-shadow:0 1px 0 rgba(0,0,0,0.35)">{{ col.label }}</span>
+              <span style="margin-left:auto;color:#FFFFFF;font-size:11.5px;background:rgba(0,0,0,0.22);border-radius:9px;padding:0 7px">{{ col.count }}</span>
+            </div>
+            <div style="padding:8px;display:grid;gap:8px">
+              <sc-for list="{{ col.items }}" as="idea" hint-placeholder-count="3">
+                <div onClick="{{ idea.onOpen }}" style="background:#FFFFFF;border:1px solid #D5D4CB;border-radius:3px;padding:9px 10px;display:grid;gap:6px;cursor:pointer;box-shadow:0 1px 1px rgba(0,0,0,0.04)" style-hover="border-color:#9CB86A;background:#FCFDF6">
+                  <div style="display:flex;align-items:center;gap:7px">
+                    <span style="font-size:11px;color:#767669">{{ idea.ref }}</span>
+                    <span style="margin-left:auto;font-size:11px;color:#767669">{{ idea.when }}</span>
+                  </div>
+                  <div style="font-size:12.5px;font-weight:bold;color:#2E4E86;line-height:1.35;text-wrap:pretty">{{ idea.title }}</div>
+                  <div style="font-size:11.5px;color:#6B6B60">{{ idea.metaLine }}</div>
+                  <div style="display:flex;align-items:center;gap:6px;border-top:1px solid #EDECE4;padding-top:6px">
+                    <button onClick="{{ idea.onUp }}" title="God idé" style="height:22px;padding:0 7px;cursor:pointer;border:1px solid {{ idea.upBorder }};border-radius:3px;background:{{ idea.upBg }};color:{{ idea.upFg }};font-weight:bold;font-size:11.5px">▲ {{ idea.up }}</button>
+                    <sc-if value="{{ allowDislike }}" hint-placeholder-val="{{ true }}">
+                      <button onClick="{{ idea.onDown }}" title="Ikke for mig" style="height:22px;padding:0 7px;cursor:pointer;border:1px solid {{ idea.downBorder }};border-radius:3px;background:{{ idea.downBg }};color:{{ idea.downFg }};font-weight:bold;font-size:11.5px">▼ {{ idea.down }}</button>
+                    </sc-if>
+                    <span style="margin-left:auto;font-size:11.5px;color:#6B6B60">{{ idea.commentCount }} svar</span>
+                  </div>
+                  <sc-if value="{{ idea.hasOfficial }}" hint-placeholder-val="{{ false }}">
+                    <div style="background:#F3F8E8;border:1px solid #C6D98A;border-radius:3px;padding:4px 6px;font-size:11px;font-weight:bold;color:#4A7A0F">Svar fra holdet »</div>
+                  </sc-if>
+                </div>
+              </sc-for>
+              <sc-if value="{{ col.empty }}" hint-placeholder-val="{{ false }}">
+                <div style="border:1px dashed #CFCEC4;border-radius:3px;padding:14px 8px;text-align:center;color:#767669;font-size:11.5px">Ingen idéer</div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+  </div>
+
+  <sc-if value="{{ sel }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeDrawer }}" style="position:fixed;inset:0;background:rgba(20,22,16,0.45);z-index:40;animation:fadein 0.15s ease-out"></div>
+    <div style="position:fixed;inset:0;z-index:41;display:grid;place-items:start center;padding:26px 16px;overflow-y:auto;pointer-events:none">
+      <div style="pointer-events:auto;width:min(640px,100%);background:#FFFFFF;border:1px solid #1C5E96;border-radius:5px;box-shadow:0 6px 22px rgba(0,0,0,0.3);overflow:hidden;animation:popin 0.16s ease-out">
+        <div style="background:linear-gradient(#59A3D8,#1E6199);padding:8px 12px;display:flex;align-items:center;gap:9px">
+          <span style="width:9px;height:9px;border-radius:50%;flex:none;background:{{ sel.statusColor }};border:1px solid rgba(0,0,0,0.25)"></span>
+          <span style="color:#FFFFFF;font-weight:bold;font-size:13px;text-shadow:0 1px 0 rgba(0,0,0,0.35)">{{ sel.statusLabel }}</span>
+          <span style="color:#D7E8F5;font-size:11.5px">{{ sel.ref }}</span>
+          <button onClick="{{ closeDrawer }}" style="margin-left:auto;width:24px;height:24px;cursor:pointer;border:1px solid #14456E;border-radius:3px;background:rgba(255,255,255,0.18);color:#FFFFFF;font-weight:bold;font-size:12px;line-height:1" style-hover="background:rgba(255,255,255,0.32)">✕</button>
+        </div>
+        <div style="padding:14px 16px;display:grid;gap:13px">
+          <h2 style="margin:0;font-size:16.5px;font-weight:bold;color:#2E4E86;line-height:1.3;text-wrap:pretty">{{ sel.title }}</h2>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;color:#5C5C54">
+            <span style="border:1px solid #E3E2D9;background:#F7F7F2;border-radius:3px;padding:2px 7px">{{ sel.cat }}</span>
+            <span style="border:1px solid #E3E2D9;background:#F7F7F2;border-radius:3px;padding:2px 7px">{{ sel.importance }}</span>
+            <span style="border:1px solid #E3E2D9;background:#F7F7F2;border-radius:3px;padding:2px 7px">Fra: {{ sel.author }}</span>
+            <span style="margin-left:auto;color:#6B6B60">{{ sel.when }}</span>
+          </div>
+          <p style="margin:0;font-size:12.5px;color:#4F4F48;white-space:pre-line;text-wrap:pretty">{{ sel.body }}</p>
+          <div style="display:flex;align-items:center;gap:8px;background:#F7F7F2;border:1px solid #E3E2D9;border-radius:4px;padding:8px 10px">
+            <button onClick="{{ sel.onUp }}" style="height:28px;padding:0 12px;cursor:pointer;border:1px solid {{ sel.upBorder }};border-radius:3px;background:{{ sel.upBg }};color:{{ sel.upFg }};font-weight:bold;font-size:12.5px">▲ God idé · {{ sel.up }}</button>
+            <sc-if value="{{ allowDislike }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ sel.onDown }}" style="height:28px;padding:0 12px;cursor:pointer;border:1px solid {{ sel.downBorder }};border-radius:3px;background:{{ sel.downBg }};color:{{ sel.downFg }};font-weight:bold;font-size:12.5px">▼ {{ sel.down }}</button>
+            </sc-if>
+            <span style="margin-left:auto;font-size:11.5px;color:#6B6B60">Én stemme pr. besøgende</span>
+          </div>
+
+          <sc-if value="{{ sel.hasOfficial }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#F3F8E8;border:1px solid #C6D98A;border-radius:4px;padding:10px 12px;display:grid;gap:4px">
+              <div style="font-size:11.5px;font-weight:bold;color:#4A7A0F">Svar fra holdet</div>
+              <div style="font-size:12.5px;color:#41522A;text-wrap:pretty">{{ sel.official }}</div>
+            </div>
+          </sc-if>
+
+          <div style="border-top:1px solid #C6D98A;padding-top:11px;display:grid;gap:9px">
+            <div style="font-weight:bold;font-size:13px">{{ sel.commentHeading }}</div>
+            <sc-for list="{{ sel.comments }}" as="c" hint-placeholder-count="2">
+              <div style="background:#F9F9F4;border:1px solid #E3E2D9;border-radius:3px;padding:8px 10px;display:grid;gap:3px">
+                <div style="font-size:11.5px;color:#6B6B60"><strong style="color:#4A7A0F">{{ c.author }}</strong> · {{ c.when }}</div>
+                <div style="font-size:12.5px;color:#4F4F48;text-wrap:pretty">{{ c.text }}</div>
+              </div>
+            </sc-for>
+            <textarea value="{{ commentDraft }}" onInput="{{ onCommentDraft }}" rows="3" placeholder="Skriv en kommentar — du behøver ikke skrive hvem du er…" style="padding:9px 10px;border:1px solid #C9C8BF;border-radius:3px;background:#FFFFFF;font-size:12.5px;resize:vertical"></textarea>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <button onClick="{{ sel.onComment }}" style="height:30px;padding:0 14px;cursor:pointer;border:1px solid #4E7A16;border-radius:3px;background:linear-gradient(#93CB45,#69A221);color:#FFFFFF;font-weight:bold;font-size:12.5px;text-shadow:0 1px 0 rgba(0,0,0,0.3)" style-hover="background:linear-gradient(#A3D95A,#78B428)">Send kommentar</button>
+              <span style="font-size:11.5px;color:#6B6B60">Hold god tone. Vi fjerner grove kommentarer.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ formOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeForm }}" style="position:fixed;inset:0;background:rgba(20,22,16,0.45);z-index:50;animation:fadein 0.15s ease-out"></div>
+    <div style="position:fixed;inset:0;z-index:51;display:grid;place-items:start center;padding:26px 16px;overflow-y:auto;pointer-events:none">
+      <div style="pointer-events:auto;width:min(620px,100%);background:#FFFFFF;border:1px solid #4E7A16;border-radius:5px;box-shadow:0 6px 22px rgba(0,0,0,0.3);overflow:hidden;animation:popin 0.16s ease-out">
+        <div style="background:linear-gradient(#93CB45,#69A221);padding:8px 12px;display:flex;align-items:center;gap:10px">
+          <span style="color:#FFFFFF;font-weight:bold;font-size:13.5px;text-shadow:0 1px 0 rgba(0,0,0,0.35)">Indsend en idé</span>
+          <button onClick="{{ closeForm }}" style="margin-left:auto;width:24px;height:24px;cursor:pointer;border:1px solid #4E7A16;border-radius:3px;background:rgba(255,255,255,0.2);color:#FFFFFF;font-weight:bold;font-size:12px;line-height:1" style-hover="background:rgba(255,255,255,0.34)">✕</button>
+        </div>
+        <div style="padding:14px 16px;display:grid;gap:12px">
+          <div style="font-size:12px;color:#5C5C54;text-wrap:pretty">Jo mere du skriver, jo nemmere er det at vurdere idéen. Der er ingen login — vi gemmer ikke hvem du er.</div>
+
+          <label style="display:grid;gap:5px">
+            <span style="font-weight:bold;font-size:12px">Titel</span>
+            <input value="{{ f.title }}" onInput="{{ onFTitle }}" placeholder="Kort og konkret" style="height:32px;padding:0 10px;border:1px solid #C9C8BF;border-radius:3px;background:#FFFFFF;font-size:13px" />
+          </label>
+
+          <label style="display:grid;gap:5px;max-width:320px">
+            <span style="font-weight:bold;font-size:12px">Område</span>
+            <select value="{{ f.cat }}" onChange="{{ onFCat }}" style="height:32px;padding:0 7px;border:1px solid #C9C8BF;border-radius:3px;background:#FFFFFF;font-size:12.5px;cursor:pointer">
+              <sc-for list="{{ catOptions }}" as="c" hint-placeholder-count="9">
+                <option value="{{ c.value }}">{{ c.label }}</option>
+              </sc-for>
+            </select>
+          </label>
+
+          <label style="display:grid;gap:5px">
+            <span style="font-weight:bold;font-size:12px">Beskriv idéen</span>
+            <textarea value="{{ f.body }}" onInput="{{ onFBody }}" rows="5" placeholder="Hvad oplever du i dag, hvad ville du hellere have, og hvornår sker det? Skriv gerne et konkret eksempel." style="padding:9px 10px;border:1px solid #C9C8BF;border-radius:3px;background:#FFFFFF;font-size:12.5px;resize:vertical"></textarea>
+          </label>
+
+          <div style="display:grid;gap:6px">
+            <span style="font-weight:bold;font-size:12px">Hvor vigtigt er det for dig?</span>
+            <div style="display:flex;gap:7px;flex-wrap:wrap">
+              <sc-for list="{{ importanceOptions }}" as="o" hint-placeholder-count="3">
+                <button onClick="{{ o.onClick }}" style="height:28px;padding:0 12px;cursor:pointer;border:1px solid {{ o.border }};border-radius:3px;background:{{ o.bg }};color:{{ o.fg }};font-weight:bold;font-size:12px">{{ o.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <label style="display:grid;gap:5px;max-width:320px">
+            <span style="font-weight:bold;font-size:12px">Dit brugernavn <span style="font-weight:normal;color:#6B6B60">valgfrit</span></span>
+            <input value="{{ f.author }}" onInput="{{ onFAuthor }}" placeholder="vises på kortet" style="height:32px;padding:0 10px;border:1px solid #C9C8BF;border-radius:3px;background:#FFFFFF;font-size:12.5px" />
+          </label>
+
+          <sc-if value="{{ formError }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FBF0F0;border:1px solid #D9A3A3;border-radius:3px;padding:7px 9px;font-size:12px;color:#8E2F2F">{{ formError }}</div>
+          </sc-if>
+        </div>
+        <div style="background:linear-gradient(#FBFBF6,#EFEFE7);border-top:1px solid #E3E2D9;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <button onClick="{{ submit }}" style="height:32px;padding:0 17px;cursor:pointer;border:1px solid #A8730F;border-radius:4px;background:linear-gradient(#EFB055,#D08A17);color:#FFFFFF;font-weight:bold;font-size:13px;text-shadow:0 1px 0 rgba(0,0,0,0.35)" style-hover="background:linear-gradient(#F6BE6B,#DC9620)">Send idé</button>
+          <span style="font-size:11.5px;color:#6B6B60;flex:1 1 200px;text-wrap:pretty">{{ submitNote }}</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:60;background:#FFF9DF;border:1px solid #E2CF6A;border-radius:4px;color:#5C4E12;font-weight:bold;font-size:12.5px;padding:9px 15px;box-shadow:0 3px 10px rgba(0,0,0,0.18);animation:fadein 0.15s ease-out">{{ toast }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;requireApproval&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Regler&quot;},&quot;allowDislike&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Regler&quot;}}">
+class Component extends DCLogic {
+  CATS = ['Kamp','Træning','Økonomi','Spilleregenskaber, værdier og vurderinger','Klubber','Klubbots','Liga og turneringer','Markedet','Andet'];
+  STATUSES = [
+    { value: 'nye', label: 'Nye idéer', color: '#59A3D8' },
+    { value: 'vurdering', label: 'Under vurdering', color: '#E8A33D' },
+    { value: 'planlagt', label: 'Godkendt', color: '#8B6FC4' },
+    { value: 'udvikling', label: 'I udvikling', color: '#93CB45' },
+    { value: 'test', label: 'Under test', color: '#31A8B8' },
+    { value: 'udgivet', label: 'Udgivet', color: '#3E9B5F' },
+    { value: 'afvist', label: 'Afslået', color: '#C46B6B' }
+  ];
+  IMPORTANCE = ['Nice to have','Vigtigt','Kritisk for mig'];
+
+  seed = [
+    { id: 41, title: 'Vis opstillingen som et taktikbræt i stedet for en liste', body: 'Jeg sætter holdet op i en liste og kan ikke se hvordan det faktisk står på banen. Et bræt hvor man trækker spillerne rundt, med roller og afstande, ville gøre det meget nemmere at forstå sin egen opstilling.', cat: 'Kamp', imp: 'Kritisk for mig', author: 'Anonym bruger', status: 'udvikling', up: 412, down: 9, when: '3 uger siden', official: 'Vi bygger den nu. Første version har træk-og-slip og fire faste formationer.', comments: [ { id: 1, author: 'Anonym', when: '2 uger siden', text: 'Ja tak. Det er det første jeg leder efter når jeg logger ind.' }, { id: 2, author: 'Mikkel', when: '9 dage siden', text: 'Gerne med mulighed for at gemme flere opstillinger.' } ] },
+    { id: 38, title: 'Individuelle træningsprogrammer pr. spiller', body: 'Hele truppen træner det samme. Jeg vil kunne give en ung back et program med fokus på forsvar og udholdenhed, mens angriberen træner afslutninger.', cat: 'Træning', imp: 'Vigtigt', author: 'Anonym bruger', status: 'planlagt', up: 288, down: 14, when: '1 måned siden', official: 'Planlagt. Vi regner med 4-6 fokusområder pr. spiller.', comments: [ { id: 3, author: 'Anonym', when: '3 uger siden', text: 'Vigtigt at det ikke bliver noget man SKAL sætte hver dag.' } ] },
+    { id: 52, title: 'Del budgettet op i løn og transfer — med varsel når det strammer', body: 'I dag er det ét stort tal, så jeg opdager først at lønnen løber løbsk når det er for sent. Vis to budgetter og advar mig inden jeg skriver en kontrakt jeg ikke kan betale.', cat: 'Økonomi', imp: 'Kritisk for mig', author: 'Anonym bruger', status: 'vurdering', up: 96, down: 1, when: '6 dage siden', official: '', comments: [ { id: 4, author: 'Anonym', when: '4 dage siden', text: 'Og gerne en prognose for resten af sæsonen.' } ] },
+    { id: 55, title: 'Vis usikkerhed på vurderinger i stedet for ét fast tal', body: 'En spiller får ét tal for potentiale, men i virkeligheden er det et gæt. Vis et interval, så man selv skal tage en risiko — det gør scouting til et rigtigt valg.', cat: 'Spilleregenskaber, værdier og vurderinger', imp: 'Vigtigt', author: 'Anders', status: 'nye', up: 74, down: 3, when: '2 dage siden', official: '', comments: [] },
+    { id: 57, title: 'Klubhistorik med rekorder og tidligere sæsoner', body: 'Der er ingen hukommelse i klubben. En side med sæsoner, placeringer, topscorere og rekorder ville give noget at spille for på lang bane.', cat: 'Klubber', imp: 'Vigtigt', author: 'Anonym bruger', status: 'nye', up: 51, down: 2, when: '1 dag siden', official: '', comments: [] },
+    { id: 58, title: 'Gem søgninger på markedet og få besked ved nye spillere', body: 'Jeg søger efter det samme hver dag: venstreback under 23 år i en bestemt prisklasse. Lad mig gemme søgningen og få en besked når der kommer en ny der passer.', cat: 'Markedet', imp: 'Nice to have', author: 'Anonym bruger', status: 'nye', up: 33, down: 6, when: '4 dage siden', official: '', comments: [] },
+    { id: 47, title: 'Turneringer man kan følge live med bracket', body: 'Man kan kun se sin egen kamp. Et bracket der opdaterer sig mens runden spilles, ville gøre cupaftener meget sjovere.', cat: 'Liga og turneringer', imp: 'Vigtigt', author: 'Anonym bruger', status: 'test', up: 121, down: 2, when: '2 uger siden', official: 'Ligger i test og kommer med næste opdatering.', comments: [] },
+    { id: 44, title: 'Graf over en spillers udvikling hen over sæsonen', body: 'Jeg kan se en spillers tal i dag, men ikke om han er blevet bedre siden sommer. En simpel kurve pr. egenskab ville være nok.', cat: 'Spilleregenskaber, værdier og vurderinger', imp: 'Nice to have', author: 'Søren', status: 'planlagt', up: 164, down: 11, when: '5 uger siden', official: '', comments: [ { id: 5, author: 'Anonym', when: '2 uger siden', text: 'Og gerne kunne sammenligne to spillere i samme graf.' } ] },
+    { id: 49, title: 'Gentag sidste kamps opstilling med én knap', body: 'Jeg sætter det samme hold op manuelt hver gang. En knap der henter sidste kamps opstilling og roller ville spare mig fem minutter dagligt.', cat: 'Kamp', imp: 'Vigtigt', author: 'Anonym bruger', status: 'udvikling', up: 203, down: 4, when: '3 uger siden', official: '', comments: [] },
+    { id: 46, title: 'Klubbots skal handle mere realistisk på markedet', body: 'Bot-klubberne byder ikke på spillere og sælger aldrig, så markedet står stille i de lave divisioner. Lad dem købe efter behov og budget.', cat: 'Klubbots', imp: 'Vigtigt', author: 'Anonym bruger', status: 'vurdering', up: 88, down: 1, when: '10 dage siden', official: '', comments: [] },
+    { id: 22, title: 'Advarsel om skadesrisiko før jeg vælger træningsintensitet', body: 'Hård fysisk træning dagen før en cupkamp koster mig spillere. Vis en risikoindikator pr. spiller inden jeg vælger intensitet.', cat: 'Træning', imp: 'Kritisk for mig', author: 'Anonym bruger', status: 'udgivet', up: 341, down: 7, when: '4 måneder siden', official: 'Udgivet. Risikoen vises pr. spiller når du vælger pas.', comments: [] },
+    { id: 19, title: 'Besked når min kamp går i gang', body: 'Jeg vil have en notifikation lige inden kampstart, så jeg kan følge den live i stedet for at læse referatet bagefter.', cat: 'Liga og turneringer', imp: 'Vigtigt', author: 'Anonym bruger', status: 'udgivet', up: 276, down: 12, when: '6 måneder siden', official: 'Udgivet. Kan slås til under Indstillinger → Beskeder.', comments: [] },
+    { id: 31, title: 'Mulighed for at slå klubbots helt fra i private ligaer', body: 'I vores private liga vil vi kun spille mod rigtige managere, også selvom der bliver huller i kalenderen.', cat: 'Klubbots', imp: 'Nice to have', author: 'Anonym bruger', status: 'afvist', up: 61, down: 34, when: '3 måneder siden', official: 'Afvist: en liga med huller ødelægger tabellen. Vi ser i stedet på bedre bots.', comments: [] },
+    { id: 35, title: 'Automatisk opstilling når man er væk', body: 'Når jeg er væk i to uger spiller jeg med 10 mand. Lad systemet vælge den bedste 11 efter form og friskhed.', cat: 'Kamp', imp: 'Vigtigt', author: 'Anonym bruger', status: 'vurdering', up: 148, down: 29, when: '2 måneder siden', official: 'Vi er i tvivl om det gør konkurrencen for nem — den ligger til vurdering.', comments: [] }
+  ];
+
+  state = {
+    section: 'board',
+    ideas: this.seed.map(i => Object.assign({ myVote: 0 }, i)),
+    cat: '', sort: 'stemmer', query: '',
+    selId: null, formOpen: false, formError: '', toast: '',
+    form: { title: '', body: '', cat: 'Kamp', imp: 'Vigtigt', author: '' },
+    commentDraft: '', nextId: 64, nextCommentId: 100
+  };
+
+  status = v => this.STATUSES.find(s => s.value === v) || this.STATUSES[0];
+  patch(id, fn) {
+    this.setState(s => ({ ideas: s.ideas.map(i => i.id === id ? Object.assign({}, i, typeof fn === 'function' ? fn(i) : fn) : i) }));
+  }
+  flash(msg) {
+    clearTimeout(this._t);
+    this.setState({ toast: msg });
+    this._t = setTimeout(() => this.setState({ toast: '' }), 2600);
+  }
+  vote(id, dir) {
+    this.patch(id, i => {
+      const was = i.myVote;
+      if (was === dir) return { myVote: 0, up: i.up - (dir === 1 ? 1 : 0), down: i.down - (dir === -1 ? 1 : 0) };
+      return {
+        myVote: dir,
+        up: i.up + (dir === 1 ? 1 : 0) - (was === 1 ? 1 : 0),
+        down: i.down + (dir === -1 ? 1 : 0) - (was === -1 ? 1 : 0)
+      };
+    });
+  }
+  card(i) {
+    return Object.assign({}, i, {
+      ref: '#' + i.id,
+      metaLine: i.cat,
+      commentCount: i.comments.length,
+      hasOfficial: !!i.official,
+      onOpen: () => this.setState({ selId: i.id, commentDraft: '' }),
+      onUp: e => { e.stopPropagation(); this.vote(i.id, 1); },
+      onDown: e => { e.stopPropagation(); this.vote(i.id, -1); },
+      upBg: i.myVote === 1 ? 'linear-gradient(#93CB45,#69A221)' : 'linear-gradient(#FDFDFA,#EFEFE7)',
+      upFg: i.myVote === 1 ? '#FFFFFF' : '#4F4F48',
+      upBorder: i.myVote === 1 ? '#4E7A16' : '#C9C8BF',
+      downBg: i.myVote === -1 ? 'linear-gradient(#D97B7B,#B04A4A)' : 'linear-gradient(#FDFDFA,#EFEFE7)',
+      downFg: i.myVote === -1 ? '#FFFFFF' : '#6B6B60',
+      downBorder: i.myVote === -1 ? '#8E2F2F' : '#C9C8BF'
+    });
+  }
+  visible() {
+    const st = this.state;
+    const q = st.query.trim().toLowerCase();
+    return st.ideas.filter(i => {
+      if (st.cat && i.cat !== st.cat) return false;
+      if (q && (i.title + ' ' + i.body).toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+  }
+  sorted(list) {
+    const s = this.state.sort;
+    const a = list.slice();
+    if (s === 'nyeste') return a.sort((x, y) => y.id - x.id);
+    if (s === 'kommentarer') return a.sort((x, y) => y.comments.length - x.comments.length);
+    return a.sort((x, y) => (y.up - y.down) - (x.up - x.down));
+  }
+  columnsFor(statuses) {
+    const list = this.sorted(this.visible());
+    return statuses.map(s => {
+      const items = list.filter(i => i.status === s.value).map(i => this.card(i));
+      return { key: s.value, label: s.label, color: s.color, count: items.length, items, empty: items.length === 0 };
+    });
+  }
+
+  renderVals() {
+    const st = this.state;
+    const p = this.props;
+    const requireApproval = p.requireApproval !== false;
+    const allowDislike = p.allowDislike !== false;
+    const all = st.ideas;
+    const sel = st.ideas.find(i => i.id === st.selId);
+    const shown = this.visible();
+    const chip = on => ({
+      bg: on ? 'linear-gradient(#93CB45,#69A221)' : 'linear-gradient(#FDFDFA,#EFEFE7)',
+      fg: on ? '#FFFFFF' : '#4F4F48',
+      border: on ? '#4E7A16' : '#C9C8BF'
+    });
+    return {
+      allowDislike,
+      query: st.query, onQuery: e => this.setState({ query: e.target.value }),
+      cat: st.cat, onCat: e => this.setState({ cat: e.target.value }),
+      catFilterOptions: [{ value: '', label: 'Alle områder' }].concat(this.CATS.map(c => ({ value: c, label: c }))),
+      sort: st.sort, onSort: e => this.setState({ sort: e.target.value }),
+      sortOptions: [{ value: 'stemmer', label: 'Flest stemmer' }, { value: 'nyeste', label: 'Nyeste først' }, { value: 'kommentarer', label: 'Mest omdiskuteret' }],
+      countLine: (shown.length === 1 ? '1 idé' : shown.length + ' idéer')
+        + (st.query.trim() ? ' matcher “' + st.query.trim() + '”' : '')
+        + (st.cat ? ' i ' + st.cat : ''),
+
+      columns: this.columnsFor(this.STATUSES),
+
+      catOptions: this.CATS.map(c => ({ value: c, label: c })),
+
+      closeDrawer: () => this.setState({ selId: null }),
+      commentDraft: st.commentDraft, onCommentDraft: e => this.setState({ commentDraft: e.target.value }),
+
+      sel: sel ? Object.assign({}, this.card(sel), {
+        statusLabel: this.status(sel.status).label,
+        statusColor: this.status(sel.status).color,
+        importance: sel.imp,
+        commentHeading: sel.comments.length + ' kommentarer',
+        comments: sel.comments,
+        onComment: () => {
+          const text = st.commentDraft.trim();
+          if (!text) return;
+          const cid = st.nextCommentId;
+          this.patch(sel.id, o => ({ comments: o.comments.concat([{ id: cid, author: 'Dig (anonym)', when: 'lige nu', text }]) }));
+          this.setState({ commentDraft: '', nextCommentId: cid + 1 });
+        }
+      }) : null,
+
+      formOpen: st.formOpen, formError: st.formError,
+      openForm: () => this.setState({ formOpen: true, formError: '' }),
+      closeForm: () => this.setState({ formOpen: false }),
+      f: st.form,
+      onFTitle: e => this.setState(s => ({ form: Object.assign({}, s.form, { title: e.target.value }) })),
+      onFBody: e => this.setState(s => ({ form: Object.assign({}, s.form, { body: e.target.value }) })),
+      onFCat: e => this.setState(s => ({ form: Object.assign({}, s.form, { cat: e.target.value }) })),
+      onFAuthor: e => this.setState(s => ({ form: Object.assign({}, s.form, { author: e.target.value }) })),
+      importanceOptions: this.IMPORTANCE.map(o => Object.assign({ label: o, onClick: () => this.setState(s => ({ form: Object.assign({}, s.form, { imp: o }) })) }, chip(st.form.imp === o))),
+      submitNote: requireApproval
+        ? 'Vi læser alle idéer igennem inden de kommer på brættet — typisk inden for et døgn.'
+        : 'Din idé kommer direkte på brættet under “Nye idéer”.',
+      submit: () => {
+        const f = st.form;
+        if (!f.title.trim() || f.body.trim().length < 20) {
+          this.setState({ formError: 'Skriv en titel og mindst et par linjer beskrivelse — ellers kan vi ikke vurdere idéen.' });
+          return;
+        }
+        const id = st.nextId;
+        if (!requireApproval) {
+          this.setState(s => ({ ideas: s.ideas.concat([{ id, title: f.title.trim(), body: f.body.trim(), cat: f.cat, imp: f.imp, author: f.author.trim() || 'Anonym', status: 'nye', up: 1, down: 0, when: 'i dag', official: '', comments: [], myVote: 1 }]) }));
+        }
+        this.setState({
+          formOpen: false, nextId: id + 1, formError: '',
+          form: { title: '', body: '', cat: 'Kamp', imp: 'Vigtigt', author: '' }
+        });
+        this.flash(requireApproval ? 'Tak! Idéen er sendt til gennemsyn' : 'Tak! Idéen ligger nu på brættet');
+      },
+      toast: st.toast
+    };
+  }
+}
+</script>
+</body>
+</html>
