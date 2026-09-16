@@ -191,6 +191,8 @@ a:hover {
   border: 1px solid var(--line-input);
   background: linear-gradient(#fdfdfa, #efefe7);
   color: var(--ink-soft);
+  /* Knapetiketter skal ikke brække over to linjer når pladsen bliver træng. */
+  white-space: nowrap;
 }
 
 .btn:disabled {
@@ -306,6 +308,12 @@ a:hover {
   color: #ffffff;
   font-size: 12px;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+  /* Bruges både til antal-linjen og til admins e-mail: forkort hellere end
+     at klemme naboen. */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* -------------------------------------------------------------- brættet */
@@ -1245,4 +1253,278 @@ a:hover {
   display: block;
   color: var(--ink-muted);
   font-size: 11.5px;
+}
+
+.mod-row-actions {
+  margin-left: auto;
+  flex: none;
+}
+
+.admin-card-move {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.move-btn {
+  width: 26px;
+  height: 22px;
+  cursor: pointer;
+  border: 1px solid var(--line-input);
+  border-radius: 3px;
+  background: linear-gradient(#fdfdfa, #efefe7);
+  color: var(--ink-soft);
+  font-weight: bold;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0;
+}
+
+.move-btn:hover:not(:disabled) {
+  border-color: #9cb86a;
+  background: linear-gradient(#ffffff, #f4f7ea);
+}
+
+.move-btn:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+/* ------------------------------------------------------- mindre skærme
+ *
+ * Skrivebordsvisningen ovenfor er designet 1:1 og røres ikke. Herunder
+ * stables brættet i stedet for at rulle sidelæns, og klikfladerne vokser
+ * til noget man kan ramme med en tommelfinger.
+ */
+
+@media (max-width: 760px) {
+  body {
+    font-size: 14px;
+  }
+
+  .content {
+    padding: 12px 12px 22px;
+  }
+
+  .topbar-row {
+    padding: 0 12px;
+  }
+
+  .topbar-tools {
+    width: 100%;
+    padding-bottom: 9px;
+  }
+
+  .search-input {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .btn-orange {
+    height: 36px;
+    font-size: 13.5px;
+  }
+
+  .nav-item {
+    font-size: 14px;
+  }
+
+  .subbar-row {
+    padding: 9px 12px;
+    gap: 6px;
+  }
+
+  /* Filtrene får hver sin linje, så de lange områdenavne kan læses. */
+  .subbar-select,
+  .subbar-select.is-wide {
+    flex: 1 1 100%;
+    max-width: none;
+    height: 34px;
+    font-size: 14px;
+  }
+
+  .subbar-label + .subbar-label,
+  .subbar-select + .subbar-label {
+    margin-left: 0;
+  }
+
+  .count-line {
+    flex: 1 1 100%;
+  }
+
+  /* Syv kolonner ved siden af hinanden bliver til syv sektioner under
+     hinanden — ingen vandret rulning på en telefon. */
+  .board {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    overflow-x: visible;
+    padding-bottom: 0;
+  }
+
+  .column,
+  .admin-column {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+  }
+
+  .column-head,
+  .panel-head {
+    padding: 10px 11px;
+  }
+
+  .column-title {
+    font-size: 14px;
+  }
+
+  .column-count {
+    font-size: 12.5px;
+    padding: 1px 9px;
+  }
+
+  .card,
+  .admin-card {
+    padding: 11px 12px;
+    gap: 8px;
+  }
+
+  .card-title {
+    font-size: 14px;
+  }
+
+  .admin-card-title {
+    font-size: 13.5px;
+  }
+
+  .card-meta,
+  .admin-card-meta,
+  .card-metaline,
+  .card-comments {
+    font-size: 12.5px;
+  }
+
+  .vote,
+  .move-btn {
+    height: 32px;
+    font-size: 13px;
+  }
+
+  .vote {
+    padding: 0 12px;
+  }
+
+  .move-btn {
+    width: 40px;
+    font-size: 15px;
+  }
+
+  .modal-layer {
+    padding: 10px 8px;
+  }
+
+  .modal-body {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .modal-title {
+    font-size: 17px;
+  }
+
+  .modal-text,
+  .comment-body,
+  .official-text,
+  .queue-body {
+    font-size: 13.5px;
+  }
+
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .modal-foot {
+    padding: 10px 12px;
+  }
+
+  /* Stemmelinjen i dialogen: knapper på én linje, noten under. */
+  .vote-bar-note {
+    flex: 1 1 100%;
+    margin-left: 0;
+  }
+
+  .vote-bar {
+    flex-wrap: wrap;
+  }
+
+  .input,
+  .select,
+  .textarea,
+  .choice {
+    font-size: 15px; /* under 16px zoomer iOS ind ved fokus */
+  }
+
+  .input,
+  .select {
+    height: 38px;
+  }
+
+  .choice {
+    height: 34px;
+  }
+
+  .field.is-narrow {
+    max-width: none;
+  }
+
+  .btn-green,
+  .btn-plain,
+  .btn-danger,
+  .btn-orange.is-large,
+  .admin-tab {
+    height: 36px;
+  }
+
+  /* Moderationsrækker: teksten først, knapperne på deres egen linje. */
+  .mod-row {
+    flex-wrap: wrap;
+    gap: 9px;
+  }
+
+  .mod-row-actions {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .login-wrap {
+    margin: 22px auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .brand {
+    padding-right: 10px;
+  }
+
+  .nav-item {
+    padding: 0 11px;
+  }
+
+  .content {
+    padding: 10px 8px 20px;
+  }
+
+  .chips-when {
+    flex: 1 1 100%;
+    margin-left: 0;
+  }
 }

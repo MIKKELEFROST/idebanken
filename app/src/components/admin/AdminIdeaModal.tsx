@@ -245,8 +245,7 @@ export function AdminIdeaModal({ idea, onClose, onPatch, onDelete, onError, onDo
               <div className="comment-body">{c.body}</div>
             </div>
             <button
-              className="btn btn-plain"
-              style={{ marginLeft: 'auto', flex: 'none' }}
+              className="btn btn-plain mod-row-actions"
               onClick={() =>
                 void run(async () => {
                   await api.setCommentHidden(c.id, !c.hidden)

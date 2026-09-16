@@ -14,6 +14,17 @@ export function AdminBoard({ ideas, onMove, onOpen }: Props) {
 
   const live = ideas.filter((i) => i.review_state === 'approved')
 
+  /**
+   * Træk-og-slip bygger på HTML5 drag-events, som ikke findes på touch. Pilene
+   * flytter et kort én kolonne ad gangen og er derfor den eneste vej på mobil
+   * — og ofte den hurtigste på skrivebordet.
+   */
+  const step = (idea: Idea, direction: -1 | 1) => {
+    const at = STATUSES.findIndex((s) => s.value === idea.status)
+    const next = STATUSES[at + direction]
+    if (next) onMove(idea.id, next.value)
+  }
+
   const drop = (status: IdeaStatus) => {
     if (dragging !== null) {
       const idea = live.find((i) => i.id === dragging)
@@ -26,8 +37,8 @@ export function AdminBoard({ ideas, onMove, onOpen }: Props) {
   return (
     <>
       <div className="notice">
-        Træk et kort til en anden kolonne for at ændre status. Ændringen er synlig for alle med
-        det samme.
+        Træk et kort til en anden kolonne, eller brug ‹ og › på kortet. Ændringen er synlig for
+        alle med det samme.
       </div>
 
       <div className="board" style={{ marginTop: 12 }}>
@@ -85,6 +96,32 @@ export function AdminBoard({ ideas, onMove, onOpen }: Props) {
                         ▲{idea.up_count} ▼{idea.down_count}
                       </span>
                     </div>
+                    <div className="admin-card-move">
+                      <button
+                        className="move-btn"
+                        disabled={s.value === STATUSES[0].value}
+                        title="Flyt en kolonne til venstre"
+                        aria-label={`Flyt ${idea.title} en kolonne til venstre`}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          step(idea, -1)
+                        }}
+                      >
+                        ‹
+                      </button>
+                      <button
+                        className="move-btn"
+                        disabled={s.value === STATUSES[STATUSES.length - 1].value}
+                        title="Flyt en kolonne til højre"
+                        aria-label={`Flyt ${idea.title} en kolonne til højre`}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          step(idea, 1)
+                        }}
+                      >
+                        ›
+                      </button>
+                    </div>
                   </div>
                 ))}
                 {items.length === 0 && <div className="column-empty">Ingen idéer</div>}
@@ -93,8 +130,6 @@ export function AdminBoard({ ideas, onMove, onOpen }: Props) {
           )
         })}
       </div>
-
-      {/* Tastaturvej til det samme: kortets dialog har en status-vælger. */}
     </>
   )
 }

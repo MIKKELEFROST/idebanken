@@ -43,7 +43,7 @@ export function AdminComments({ onError, onDone }: Props) {
             </div>
             <div className="comment-body">{c.body}</div>
           </div>
-          <div className="row-actions" style={{ marginLeft: 'auto', flex: 'none' }}>
+          <div className="row-actions mod-row-actions">
             <button
               className="btn btn-plain"
               onClick={() =>
