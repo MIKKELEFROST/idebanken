@@ -22,18 +22,19 @@ npm run dev
 
 ### 1. Databasen
 
-Kør de to filer i `supabase/migrations/` i rækkefølge i Supabase' SQL Editor
-(Project → SQL Editor → New query), og derefter `supabase/seed.sql` hvis du vil
-starte med eksempelindholdet fra prototypen.
+**Er allerede kørt** på projektet `IdeBanken`
+(`vijrgeoqukkwnjanhwcm`, eu-west-1): alle migrationer i `supabase/migrations/`
+plus `supabase/seed.sql` med de 14 eksempelidéer fra prototypen.
 
-Har du Supabase CLI'en, kan du i stedet køre:
+Skal du sætte et nyt miljø op, kør filerne i `supabase/migrations/` i
+rækkefølge i SQL Editor, eller med CLI'en:
 
 ```bash
 supabase link --project-ref <ref>
 supabase db push
 ```
 
-Eksempelindholdet er de 14 idéer fra designet. Ryd det igen med:
+Eksempelindholdet er prototypens idéer med opdigtede stemmetal. Ryd det med:
 
 ```sql
 delete from public.ideas where id < 100;
@@ -56,11 +57,12 @@ så ingen andre kan lave sig en konto.
 
 ### 3. Nøglerne
 
-`.env.local`:
+`.env.local` (ligger allerede lokalt, men er gitignored — sæt de samme to hos
+hosten når du deployer):
 
 ```
-VITE_SUPABASE_URL=https://<ref>.supabase.co
-VITE_SUPABASE_ANON_KEY=<anon/publishable key>
+VITE_SUPABASE_URL=https://vijrgeoqukkwnjanhwcm.supabase.co
+VITE_SUPABASE_ANON_KEY=sb_publishable_2_n8WPgdpzanUkyXU3V9sg_gZg_o0tj
 ```
 
 Begge er offentlige og hører til i browseren. `service_role`-nøglen må aldrig
