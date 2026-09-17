@@ -23,8 +23,11 @@ npm run dev
 ### 1. Databasen
 
 **Er allerede kørt** på projektet `IdeBanken`
-(`vijrgeoqukkwnjanhwcm`, eu-west-1): alle migrationer i `supabase/migrations/`
-plus `supabase/seed.sql` med de 14 eksempelidéer fra prototypen.
+(`vijrgeoqukkwnjanhwcm`, eu-west-1): alle migrationer i `supabase/migrations/`.
+
+Eksempelindholdet i `supabase/seed.sql` blev kørt og derefter ryddet igen —
+brættet i drift starter tomt. Kør filen, hvis du vil have prototypens 14 idéer
+tilbage til et demo-miljø.
 
 Skal du sætte et nyt miljø op, kør filerne i `supabase/migrations/` i
 rækkefølge i SQL Editor, eller med CLI'en:
