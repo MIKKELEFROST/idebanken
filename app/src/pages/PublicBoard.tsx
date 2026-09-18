@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { BoardScroll } from '../components/BoardScroll'
 import { IdeaCard } from '../components/IdeaCard'
 import { IdeaModal } from '../components/IdeaModal'
 import { SubmitModal, type SubmitValues } from '../components/SubmitModal'
@@ -120,7 +121,7 @@ export function PublicBoard() {
         ) : board.error ? (
           <div className="error-box">{board.error}</div>
         ) : (
-          <div className="board">
+          <BoardScroll>
             {board.columns.map((col) => (
               <div className="column" key={col.key}>
                 <div className="column-stripe" style={{ background: col.color }} />
@@ -144,7 +145,7 @@ export function PublicBoard() {
                 </div>
               </div>
             ))}
-          </div>
+          </BoardScroll>
         )}
       </div>
 

@@ -330,6 +330,41 @@ a:hover {
   overflow-x: auto;
   padding-bottom: 10px;
   align-items: flex-start;
+  /* Rullebjælken ligger over brættet i stedet — se .board-rail. */
+  scrollbar-width: none;
+}
+
+.board::-webkit-scrollbar {
+  display: none;
+}
+
+/*
+ * Den vandrette rullebjælke, flyttet op over kolonnerne. Browserens egen sad i
+ * bunden af brættet og forsvandt under skærmkanten, når en kolonne blev lang.
+ * Den her er tegnet i hånden — se BoardScroll.tsx for hvorfor.
+ */
+.board-rail {
+  position: relative;
+  height: 10px;
+  margin-bottom: 8px;
+  border-radius: 5px;
+  background: var(--line-soft);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.board-rail-grip {
+  position: absolute;
+  top: 1px;
+  left: 0;
+  height: 6px;
+  border-radius: 3px;
+  background: #b0ac9c;
+}
+
+.board-rail-grip:hover {
+  background: #98947f;
 }
 
 .column {

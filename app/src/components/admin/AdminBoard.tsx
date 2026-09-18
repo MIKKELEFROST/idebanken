@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { BoardScroll } from '../BoardScroll'
 import { STATUSES } from '../../lib/constants'
 import type { Idea, IdeaStatus } from '../../lib/types'
 
@@ -41,7 +42,7 @@ export function AdminBoard({ ideas, onMove, onOpen }: Props) {
         alle med det samme.
       </div>
 
-      <div className="board" style={{ marginTop: 12 }}>
+      <BoardScroll style={{ marginTop: 12 }}>
         {STATUSES.map((s) => {
           const items = live
             .filter((i) => i.status === s.value)
@@ -129,7 +130,7 @@ export function AdminBoard({ ideas, onMove, onOpen }: Props) {
             </div>
           )
         })}
-      </div>
+      </BoardScroll>
     </>
   )
 }
